@@ -1,0 +1,702 @@
+---
+title: "All Tables — Bolus + HRS Criteria Cohort"
+date: today
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+Every table from `Tables.Rmd` (`/Users/to909/Desktop/Tables`), recomputed on the cohort restricted to **bolus terlipressin initiation (`terli_route_day0 == 1`) AND at least one of criteria 1–4 met (`HRS_Criteria == 1`)**. Each table has a **Download Excel** link directly underneath; the same tables are also written as CSVs to `Results/`.
+
+Conventions (identical to the originals): continuous variables are median [IQR] with Kruskal–Wallis tests (= Mann–Whitney for two groups); categorical variables are n (%) with chi-squared tests, or Fisher's exact test where the original used it (adverse-event tables); `Missing` is the percentage of the cohort missing that variable; the `Overall` column is display-only — p-values compare the strata.
+
+```{r setup}
+#| include: false
+library(tidyverse)
+library(readxl)
+library(tableone)
+library(writexl)
+
+# Match the collation the original Tables.Rmd runs used (RStudio, en_US.UTF-8),
+# so free-text factor levels sort identically.
+Sys.setlocale("LC_COLLATE", "en_US.UTF-8")
+
+source(knitr::purl(
+  "/Users/to909/Desktop/Terlipressin projects/Terlipressin/code/shared_pipeline.qmd",
+  quiet = TRUE
+))
+```
+
+## Cohort
+
+```{r cohort}
+#| code-fold: true
+#| code-summary: "Show code — cohort definition"
+cohort <- master %>% filter(terli_route_day0 == 1, HRS_Criteria == 1)
+
+knitr::kable(
+  tibble(
+    Step = c(
+      "Master dataset (shared pipeline, final_master_01282026)",
+      "Bolus terlipressin initiation (terli_route_day0 == 1)",
+      "+ meets >=1 of criteria 1-4 (HRS_Criteria == 1) - final cohort"
+    ),
+    N = c(
+      nrow(master),
+      sum(master$terli_route_day0 == 1, na.rm = TRUE),
+      nrow(cohort)
+    )
+  ),
+  caption = "Cohort flow"
+)
+```
+
+```{r helper}
+#| code-fold: true
+#| code-summary: "Show code — table helper (make_table)"
+results_dir <- "/Users/to909/Desktop/Terlipressin projects/Request/Request 11:19:2026/Results"
+dir.create(results_dir, showWarnings = FALSE, recursive = TRUE)
+dir.create("tables", showWarnings = FALSE)
+
+run_notes <- character(0)
+note <- function(msg) {
+  run_notes <<- c(run_notes, msg)
+  invisible(NULL)
+}
+
+# Build one table exactly as Tables.Rmd did (tableone; showAllLevels, nonnormal
+# = all continuous vars, Missing %), write it as CSV (Results/) and XLSX
+# (docs/tables/, served by the site), and return it as a kable.
+# - Variables not in the data, or entirely missing within the cohort, are
+#   dropped and recorded in `run_notes`.
+# - If the stratifier has fewer than 2 levels inside this cohort (e.g.
+#   HRS_Criteria, terli_route_day0), the table falls back to an overall-only
+#   column and that is recorded too.
+make_table <- function(all_vars, data, strata, slug,
+                       cat_vars = NULL, exact = NULL, caption = NULL,
+                       family = slug) {
+  all_vars <- unique(trimws(all_vars))
+
+  not_in_data <- setdiff(all_vars, names(data))
+  if (length(not_in_data) > 0) {
+    note(paste0(family, ": not collected in the master dataset, dropped: ",
+                paste(not_in_data, collapse = ", "), "."))
+    all_vars <- intersect(all_vars, names(data))
+  }
+
+  all_na <- all_vars[sapply(data[all_vars], function(x) all(is.na(x)))]
+  if (length(all_na) > 0) {
+    note(paste0(family, ": entirely missing within this cohort, dropped: ",
+                paste(all_na, collapse = ", "), "."))
+    all_vars <- setdiff(all_vars, all_na)
+  }
+
+  cat_vars <- intersect(unique(trimws(cat_vars)), all_vars)
+  exact <- intersect(unique(trimws(exact)), all_vars)
+  numerical_vars <- setdiff(all_vars, cat_vars)
+
+  strata_levels <- if (is.null(strata)) character(0) else unique(na.omit(as.character(data[[strata]])))
+  use_strata <- !is.null(strata) && length(strata_levels) >= 2
+  if (!is.null(strata) && !use_strata) {
+    note(paste0(family, ": stratifier `", strata, "` has a single level in this cohort (all = ",
+                paste(strata_levels, collapse = "/"), ") - overall column only, no tests."))
+  }
+
+  if (use_strata) {
+    T1 <- tableone::CreateTableOne(
+      vars = all_vars, strata = strata, data = data,
+      factorVars = cat_vars, addOverall = TRUE, includeNA = FALSE
+    )
+  } else {
+    T1 <- tableone::CreateTableOne(
+      vars = all_vars, data = data,
+      factorVars = cat_vars, includeNA = FALSE
+    )
+  }
+
+  T1_print <- print(
+    T1,
+    showAllLevels = TRUE,
+    exact         = if (use_strata) exact else NULL,
+    nonnormal     = numerical_vars,
+    missing       = TRUE,
+    quote         = FALSE,
+    noSpaces      = TRUE,
+    printToggle   = FALSE
+  )
+
+  # The original CSVs leave the p-value blank (not "NA") for degenerate
+  # single-level variables; match that.
+  if ("p" %in% colnames(T1_print)) {
+    p_na <- is.na(T1_print[, "p"]) | T1_print[, "p"] == "NA"
+    T1_print[p_na, "p"] <- ""
+  }
+
+  write.csv(T1_print, file = file.path(results_dir, paste0(slug, ".csv")), row.names = TRUE)
+  write_xlsx(
+    data.frame(Variable = rownames(T1_print), T1_print,
+               row.names = NULL, check.names = FALSE),
+    file.path("tables", paste0(slug, ".xlsx"))
+  )
+
+  knitr::kable(T1_print, caption = caption)
+}
+```
+
+```{r variable-lists}
+#| code-fold: true
+#| code-summary: "Show code — variable lists (from Tables.Rmd)"
+categorical_vars <- c(
+  "admit_admitservice", "admit_admitroute", "sex_male", "race", "hispanic",
+  "insurance_type", "cirrhosis_etiology", "etoh_hepatitis", "hegrade_admit",
+  "admit_ascites", "htn_medical_hx", "dm_medical_hx", "ckd_medical_hx",
+  "cad_medical_hx", "nsbb_preadmission", "nsbb_type_preadmission",
+  "ace_arb_preadmission", "nsaid_preadmission", "diuretics_preadmission",
+  "sbp_ppx_preadmission", "lactulose_preadmission", "rifaximin_preadmission",
+  "mido_preadmission", "ascites_previous_comp", "refascites_previous_comp",
+  "he_previous_comp", "sbp_previous_comp", "nonsbp_previous_comp",
+  "phtn_bleed_previous_comp", "hcc_previous_comp", "tips_previous_comp",
+  "baseline_scr_outpt", "aki_previous_90days", "transfer_aki",
+  "aki_precipitant_nsbpinf", "he_aki", "rrt_aki", "mv_aki", "pressors_aki",
+  "chest_imaging", "chest_imaging_pulmedema", "chest_imaging_effusion",
+  "ecg", "echo", "albumin_before_terli", "crystalloid_before_terli",
+  "nsbb_before_terli", "mido_before_terli", "oct_before_terli",
+  "ne_before_terli", "gihep_consult", "neph_consult", "pall_consult",
+  "code_status", "ua_hrs", "ua_na_hrs", "ua_cr_hrs", "ua_urea_hrs",
+  "ua_granularcasts_hrs", "ua_epi_cells_hrs", "location_terli_day0",
+  "terli_route_day0", "tele_terli_day0", "he_terli_day0",
+  "infection_terli_day0", "typeinfection_terli_day0", "hrs_responders",
+  "dosechange_terli_day1", "dosechange_terli_day2", "dosechange_terli_day3",
+  "dosechange_terli_day4", "dosechange_terli_day5", "dosechange_terli_day6",
+  "dosechange_terli_day7", "dosechange_terli_day8", "dosechange_terli_day9",
+  "dosechange_terli_day10", "dosechange_terli_day11", "dosechange_terli_day12",
+  "discont_aki_stage", "aclf_grade", "HRS_Criteria", "criteria_1",
+  "criteria_2", "criteria_3", "criteria_4", "akin", "transplant_slkt",
+  "transplant_lt", "rrt", "rrt_2", "rrt_modality", "rrt_continuous",
+  "hd_discharge", "disposition", "liver_f", "brain_f", "coagulation_f",
+  "circulatory_f", "respiratory_f", "kidney_f", "baseline_scr_120to365",
+  "aki_events_previous90days", "prbc_trans_before_terli",
+  "time_to_death_status", "terli_ae_abdpain", "terli_ae_nausea",
+  "terli_ae_diarrhea", "terli_ae_volover", "terli_ae_brady", "terli_7",
+  "terli_8", "terli_ae_respfail", "any_ae", "listed_transplant",
+  "dosechange_status", "hrs_rebound", "race_2", "HRS_reversal_new",
+  "hrs_responders_cat_2", "time_to_death_status_90days",
+  "time_to_death_status_90days_cmp", "ckd_baseline", "HRS_criteria_3"
+)
+
+numerical_vars <- c(
+  "age", "scr_admit", "tbili_admit", "inr_admit", "sodium_admit",
+  "albumin_admit", "lactate_admit", "nsbb_dose_preadmission",
+  "mido_dose_preadmission", "baseline_scr", "baseline_scr_days_to_admit",
+  "transfer_aki_days_toadmit", "days_admit_to_aki", "aki_weight",
+  "aki_height", "aki_hr", "aki_sbp", "aki_dbp", "aki_map", "aki_pao2",
+  "fio2_aki", "scr_aki", "bun_aki", "albumin_aki", "inr_aki", "wbc_aki",
+  "plt_aki", "ecg_qtc", "days_to_echo", "echo_ef", "echo_lateral_e",
+  "echo_trpeak", "echo_gls", "echo_earatio", "echo_rvsp", "echo_pasp",
+  "echo_lavi", "echo_tr", "totalalbumin_before_terli",
+  "albvolume_before_terli", "saline_vol_before_terli",
+  "lr_volume_before_terli", "other_cryst_before_terli",
+  "prbc_qaunt_before_terli", "totalvolume_before_terli",
+  "total_uo_before_terli", "days_first_mido_before_terli",
+  "days_total_mido_before_terli", "mido_maxdose_before_terli",
+  "days_first_oct_before_terli", "days_total_oct_before_terli",
+  "oct_maxdose_before_terli", "days_first_ne_before_terli",
+  "days_total_ne_before_terli", "days_to_gihep_consult",
+  "days_to_neph_consult", "days_to_pall_consult", "days_ua_hrs",
+  "days_ua_na_hrs", "ua_na_value_hrs", "days_ua_cr_hrs", "ua_cr_value_hrs",
+  "days_ua_urea_hrs", "ua_urea_value_hrs", "feurea_hrs", "ua_rbc_hrs",
+  "uaprotein_hrs", "temp_terli_day0", "hr_terli_day0", "pao2_terli_day0",
+  "fio2_terli_day0", "sbp_terli_day0_time0", "map_terli_day0_time0",
+  "chloride_terli_day0", "bicarb_terli_day0", "scr_terli_day0",
+  "bun_terli_day0", "ast_terli_day0", "alt_terli_day0", "bili_terli_day0",
+  "alb_terli_day0", "inr_terli_day0", "wbc_terli_day0", "hgb_terli_day0",
+  "Discont_Day", "na_terli_day0", "days_to_terli_initiation_day0",
+  "clif_c_score", "admit_meld", "admit_meld_na", "admit_meld_3",
+  "admit_meld_3_raw", "day0_meld", "day0_meld_na", "day0_meld_3",
+  "time_to_transplant", "time_to_death_status", "time_to_death_90days",
+  "cystatinc_admit", "cystatinc_aki", "cystatinc_terli_day0", "urine_pc",
+  "fena", "fena_hrs", "total_albumin"
+)
+
+all_vars <- unique(c(numerical_vars, categorical_vars))
+
+followup_variables <- c(
+  "dc_aki_recurrence", "dc_aki_recurrence_number", "dc_aki_recurrence_date",
+  "days_to_aki_recurrence", "dc_aki_recurrence_eitology", "dc_terli_use",
+  "dc_terli_use_date", "dc_days_to_terli_use", "dc_hd_status",
+  "dc_death_90days", "dc_lastecounter_date", "dc_days_lastencounter",
+  "dc_death90_date", "dc_days_to_death", "dc_lost_to_followup_date",
+  "days_to_lost_to_followup", "dc_lt_90days", "dc_lt90_date", "dc_days_lt",
+  "dc_hdstatus_lt", "dc_lt_evalsafetynet", "dc_lt_safetynetreason",
+  "dc_lt_safetynetreasonother", "dc_lt_listedsafetynet",
+  "dc_lt_safetynetktdate", "dc_lt_daystosafetynetkt",
+  "dc_90scr_notavailable_lt", "dc_scr_90day_postlt_value",
+  "dc_scr_90day_postlt_date", "dc_days_to_90dayscr_lt", "dc_neph_followup",
+  "dc_neph_followup_date", "dc_days_to_neph_followup", "dc_gihep_followup",
+  "dc_gihep_followup_date", "dc_days_to_gihep_followup",
+  "dc_30scr_notavailable", "dc_scr30_value", "dc_scr_30days_date",
+  "dc_days_scr30", "dc_60scr_notavailable", "dc_scr60_value",
+  "dc_scr_60days_date", "dc_days_scr60", "dc_90scr_notavailable",
+  "dc_scr90_value", "dc_scr_90days_date", "dc_days_scr91",
+  "vital_status_1yr", "last_encounter_1yr", "days_to_last_encounter_1yr",
+  "date_death_1yr", "days_to_death_1yr", "date_lastencounter_1yr",
+  "days_lastencounter_1yr", "hd_status_1yr", "scr_available_1yr",
+  "scr_value_1yr", "scr_date_1yr", "days_to_scr_1yr", "lt_status_1yr",
+  "lt_type_1yr", "lt_date_1yr", "days_to_lt_1yr", "tips_1yr",
+  "tips_1yr_indication", "tips_1yr_other", "tips_1yr_date"
+)
+# Same filter as Tables.Rmd: no date variables
+followup_variables <- followup_variables[!grepl("date", followup_variables, ignore.case = TRUE)]
+
+cat_followup_variables <- c(
+  "dc_aki_recurrence", "dc_aki_recurrence_eitology", "dc_terli_use",
+  "dc_hd_status", "dc_death_90days", "dc_lt_90days", "dc_lt_evalsafetynet",
+  "dc_lt_safetynetreason", "dc_lt_safetynetreasonother",
+  "dc_lt_listedsafetynet", "dc_lt_daystosafetynetkt", "dc_neph_followup",
+  "dc_gihep_followup", "vital_status_1yr", "hd_status_1yr", "lt_status_1yr",
+  "lt_type_1yr", "tips_1yr", "tips_1yr_indication", "tips_1yr_other",
+  "dc_hdstatus_lt"
+)
+
+hospitalization_course_variables <- c(
+  "total_albumin_post_terli", "total_prbc_post_terli", "gibleed_hosp",
+  "gibleed_date", "days_to_gibleed", "noso_infection", "noso_infection_date",
+  "days_to_noso_infection", "type_noso_infection", "other_noso_infection",
+  "icu_admit", "icu_admit_date", "days_to_icu_admit", "icu_dc_date",
+  "days_to_icu_dc", "mv_use", "mv_date", "days_to_mv", "mv_extubation_date",
+  "days_to_mv_extubation", "norepi_post_terli", "norepi_post_terli_date",
+  "days_to_norepi_post_terli", "norepi_post_terli_dc_date",
+  "days_norepi_post_terli", "dc_date", "days_to_discharge", "dc_sna",
+  "dc_scr", "dc_albumin", "dc_tbili", "dc_inr", "nsbb_dc", "nsbb_dc_dose",
+  "dc_diuretics", "dc_k_sparing_diuretic", "dc_midodrine",
+  "dc_midodrine_total", "dc_octreotide", "dc_octreotide_total",
+  "dc_rifaximin", "dc_lactulose", "dc_sbp_ppx", "disposition", "lt_eval",
+  "lt_eval_date", "days_to_lt_eval", "lteval_listingstatus",
+  "lt_listing_date", "days_to_lt_listing", "lt_during_hospital",
+  "slkt_during_hospital", "lt_date", "days_to_lt"
+)
+# Same filter as Tables.Rmd: no *_date variables
+hospitalization_course_variables <-
+  hospitalization_course_variables[!grepl("_date$", hospitalization_course_variables)]
+
+cat_hospitalization_course_variables <- c(
+  "slkt_during_hospital", "lt_during_hospital", "lteval_listingstatus",
+  "lt_eval", "dc_sbp_ppx", "dc_lactulose", "dc_rifaximin", "dc_midodrine",
+  "dc_k_sparing_diuretic", "dc_diuretics", "nsbb_dc", "norepi_post_terli",
+  "mv_use", "icu_admit", "type_noso_infection", "noso_infection",
+  "gibleed_hosp", "dc_octreotide", "disposition"
+)
+
+hrs_clinical_course_variables <- c(
+  paste0("scr_day", 1:14, "_post_terli"),
+  "HRS_reversal_new", "days_to_hrsreversal", "hrsrecovery",
+  "days_to_hrsrecovery", "recurrentaki", "recurrentaki_number",
+  "days_to_recurrentaki", "recurrentaki_akietiology", "retreatment_terli",
+  "nadirhospit_scr", "days_to_nadirhospit_scr", "peakhospit_scr",
+  "days_to_peakhospitscr", "rrt", "days_to_rrt", "rrt_modality",
+  "rrt_continuous", "days_to_rrt_continuous", "hd_discharge",
+  paste0("rrt_indication___", 1:7), "rrt_indication_other"
+)
+
+num_hrs_clinical_course_variables <- c(
+  paste0("scr_day", 1:14, "_post_terli"),
+  "days_to_hrsreversal", "days_to_hrsrecovery", "recurrentaki_number",
+  "days_to_recurrentaki", "nadirhospit_scr", "peakhospit_scr",
+  "days_to_peakhospitscr", "days_to_rrt"
+)
+
+cat_hrs_clinical_course_variables <- c(
+  "HRS_reversal_new", "hrsrecovery", "recurrentaki_akietiology",
+  "retreatment_terli", "rrt", "rrt_modality", "rrt_continuous",
+  "hd_discharge", "recurrentaki",
+  paste0("rrt_indication___", 1:7), "rrt_indication_other"
+)
+
+ae_vars <- c(
+  "any_ae", "terli_ae_abdpain", "terli_ae_nausea", "terli_ae_diarrhea",
+  "terli_ae_volover", "terli_ae_brady", "terli_7", "terli_8",
+  "terli_ae_respfail"
+)
+
+t1_strata <- c(
+  "HRS_reversal_new", "hrs_responders", "hrs_responders_cat_2",
+  "time_to_death_status_90days", "HRS_criteria_3", "HRS_criteria_meld"
+)
+```
+
+```{r coercions}
+#| code-fold: true
+#| code-summary: "Show code — type coercions (from Tables.Rmd)"
+# Numeric coercions first (before any factor conversion)
+cohort <- cohort %>%
+  mutate(
+    mido_maxdose_before_terli = as.numeric(mido_maxdose_before_terli),
+    # dc_tbili arrives as text (e.g. "12.3 mg/dL"); extract the number, as in Tables.Rmd
+    dc_tbili = as.numeric(str_extract(dc_tbili, "\\d+\\.?\\d*")),
+    # MELD >= 35 flag used by the AE tables (admit_meld_3_raw = non-imputed MELD 3.0)
+    meld_35 = if_else(admit_meld_3_raw >= 35, ">=35", "<35")
+  ) %>%
+  mutate(across(any_of(num_hrs_clinical_course_variables), as.numeric)) %>%
+  # Factor conversions (as in Tables.Rmd; make_table also passes factorVars)
+  mutate(across(any_of(unique(c(
+    categorical_vars, cat_followup_variables,
+    cat_hospitalization_course_variables, cat_hrs_clinical_course_variables
+  ))), as.factor))
+```
+
+# Table 1 — demographics & clinical characteristics
+
+```{r t1-hrs-reversal}
+#| code-fold: true
+#| code-summary: "Show code — Table 1 by HRS_reversal_new"
+make_table(all_vars, cohort, "HRS_reversal_new", "table1_by_HRS_reversal_new",
+           cat_vars = categorical_vars, family = "Table 1",
+           caption = "Table 1 by HRS_reversal_new (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/table1_by_HRS_reversal_new.xlsx)
+
+```{r t1-hrs-responders}
+#| code-fold: true
+#| code-summary: "Show code — Table 1 by hrs_responders"
+make_table(all_vars, cohort, "hrs_responders", "table1_by_hrs_responders",
+           cat_vars = categorical_vars, family = "Table 1",
+           caption = "Table 1 by hrs_responders (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/table1_by_hrs_responders.xlsx)
+
+```{r t1-hrs-responders-cat2}
+#| code-fold: true
+#| code-summary: "Show code — Table 1 by hrs_responders_cat_2"
+make_table(all_vars, cohort, "hrs_responders_cat_2", "table1_by_hrs_responders_cat_2",
+           cat_vars = categorical_vars, family = "Table 1",
+           caption = "Table 1 by hrs_responders_cat_2 (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/table1_by_hrs_responders_cat_2.xlsx)
+
+```{r t1-death90}
+#| code-fold: true
+#| code-summary: "Show code — Table 1 by time_to_death_status_90days"
+make_table(all_vars, cohort, "time_to_death_status_90days", "table1_by_time_to_death_status_90days",
+           cat_vars = categorical_vars, family = "Table 1",
+           caption = "Table 1 by time_to_death_status_90days (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/table1_by_time_to_death_status_90days.xlsx)
+
+```{r t1-criteria3}
+#| code-fold: true
+#| code-summary: "Show code — Table 1 by HRS_criteria_3"
+make_table(all_vars, cohort, "HRS_criteria_3", "table1_by_HRS_criteria_3",
+           cat_vars = categorical_vars, family = "Table 1",
+           caption = "Table 1 by HRS_criteria_3 (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/table1_by_HRS_criteria_3.xlsx)
+
+```{r t1-criteria-meld}
+#| code-fold: true
+#| code-summary: "Show code — Table 1 by HRS_criteria_meld"
+make_table(all_vars, cohort, "HRS_criteria_meld", "table1_by_HRS_criteria_meld",
+           cat_vars = categorical_vars, family = "Table 1",
+           caption = "Table 1 by HRS_criteria_meld (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/table1_by_HRS_criteria_meld.xlsx)
+
+# Follow-up instrument
+
+```{r fu-hrs-reversal}
+#| code-fold: true
+#| code-summary: "Show code — Follow-up by HRS_reversal_new"
+make_table(followup_variables, cohort, "HRS_reversal_new", "followup_by_HRS_reversal_new",
+           cat_vars = cat_followup_variables, family = "Follow-up",
+           caption = "Follow-up by HRS_reversal_new (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/followup_by_HRS_reversal_new.xlsx)
+
+```{r fu-hrs-responders}
+#| code-fold: true
+#| code-summary: "Show code — Follow-up by hrs_responders"
+make_table(followup_variables, cohort, "hrs_responders", "followup_by_hrs_responders",
+           cat_vars = cat_followup_variables, family = "Follow-up",
+           caption = "Follow-up by hrs_responders (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/followup_by_hrs_responders.xlsx)
+
+```{r fu-hrs-responders-cat2}
+#| code-fold: true
+#| code-summary: "Show code — Follow-up by hrs_responders_cat_2"
+make_table(followup_variables, cohort, "hrs_responders_cat_2", "followup_by_hrs_responders_cat_2",
+           cat_vars = cat_followup_variables, family = "Follow-up",
+           caption = "Follow-up by hrs_responders_cat_2 (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/followup_by_hrs_responders_cat_2.xlsx)
+
+```{r fu-death90}
+#| code-fold: true
+#| code-summary: "Show code — Follow-up by time_to_death_status_90days"
+make_table(followup_variables, cohort, "time_to_death_status_90days", "followup_by_time_to_death_status_90days",
+           cat_vars = cat_followup_variables, family = "Follow-up",
+           caption = "Follow-up by time_to_death_status_90days (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/followup_by_time_to_death_status_90days.xlsx)
+
+```{r fu-criteria3}
+#| code-fold: true
+#| code-summary: "Show code — Follow-up by HRS_criteria_3"
+make_table(followup_variables, cohort, "HRS_criteria_3", "followup_by_HRS_criteria_3",
+           cat_vars = cat_followup_variables, family = "Follow-up",
+           caption = "Follow-up by HRS_criteria_3 (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/followup_by_HRS_criteria_3.xlsx)
+
+```{r fu-criteria-meld}
+#| code-fold: true
+#| code-summary: "Show code — Follow-up by HRS_criteria_meld"
+make_table(followup_variables, cohort, "HRS_criteria_meld", "followup_by_HRS_criteria_meld",
+           cat_vars = cat_followup_variables, family = "Follow-up",
+           caption = "Follow-up by HRS_criteria_meld (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/followup_by_HRS_criteria_meld.xlsx)
+
+# Hospital course instrument
+
+```{r hosp-hrs-reversal}
+#| code-fold: true
+#| code-summary: "Show code — Hospital course by HRS_reversal_new"
+make_table(hospitalization_course_variables, cohort, "HRS_reversal_new", "hospitalization_by_HRS_reversal_new",
+           cat_vars = cat_hospitalization_course_variables, family = "Hospital course",
+           caption = "Hospital course by HRS_reversal_new (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/hospitalization_by_HRS_reversal_new.xlsx)
+
+```{r hosp-hrs-responders}
+#| code-fold: true
+#| code-summary: "Show code — Hospital course by hrs_responders"
+make_table(hospitalization_course_variables, cohort, "hrs_responders", "hospitalization_by_hrs_responders",
+           cat_vars = cat_hospitalization_course_variables, family = "Hospital course",
+           caption = "Hospital course by hrs_responders (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/hospitalization_by_hrs_responders.xlsx)
+
+```{r hosp-hrs-responders-cat2}
+#| code-fold: true
+#| code-summary: "Show code — Hospital course by hrs_responders_cat_2"
+make_table(hospitalization_course_variables, cohort, "hrs_responders_cat_2", "hospitalization_by_hrs_responders_cat_2",
+           cat_vars = cat_hospitalization_course_variables, family = "Hospital course",
+           caption = "Hospital course by hrs_responders_cat_2 (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/hospitalization_by_hrs_responders_cat_2.xlsx)
+
+```{r hosp-death90}
+#| code-fold: true
+#| code-summary: "Show code — Hospital course by time_to_death_status_90days"
+make_table(hospitalization_course_variables, cohort, "time_to_death_status_90days", "hospitalization_by_time_to_death_status_90days",
+           cat_vars = cat_hospitalization_course_variables, family = "Hospital course",
+           caption = "Hospital course by time_to_death_status_90days (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/hospitalization_by_time_to_death_status_90days.xlsx)
+
+```{r hosp-criteria3}
+#| code-fold: true
+#| code-summary: "Show code — Hospital course by HRS_criteria_3"
+make_table(hospitalization_course_variables, cohort, "HRS_criteria_3", "hospitalization_by_HRS_criteria_3",
+           cat_vars = cat_hospitalization_course_variables, family = "Hospital course",
+           caption = "Hospital course by HRS_criteria_3 (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/hospitalization_by_HRS_criteria_3.xlsx)
+
+```{r hosp-criteria-meld}
+#| code-fold: true
+#| code-summary: "Show code — Hospital course by HRS_criteria_meld"
+make_table(hospitalization_course_variables, cohort, "HRS_criteria_meld", "hospitalization_by_HRS_criteria_meld",
+           cat_vars = cat_hospitalization_course_variables, family = "Hospital course",
+           caption = "Hospital course by HRS_criteria_meld (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/hospitalization_by_HRS_criteria_meld.xlsx)
+
+# HRS clinical course instrument
+
+```{r clin-hrs-reversal}
+#| code-fold: true
+#| code-summary: "Show code — HRS clinical course by HRS_reversal_new"
+make_table(hrs_clinical_course_variables, cohort, "HRS_reversal_new", "hrs_clinical_by_HRS_reversal_new",
+           cat_vars = cat_hrs_clinical_course_variables, family = "HRS clinical course",
+           caption = "HRS clinical course by HRS_reversal_new (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/hrs_clinical_by_HRS_reversal_new.xlsx)
+
+```{r clin-hrs-responders}
+#| code-fold: true
+#| code-summary: "Show code — HRS clinical course by hrs_responders"
+make_table(hrs_clinical_course_variables, cohort, "hrs_responders", "hrs_clinical_by_hrs_responders",
+           cat_vars = cat_hrs_clinical_course_variables, family = "HRS clinical course",
+           caption = "HRS clinical course by hrs_responders (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/hrs_clinical_by_hrs_responders.xlsx)
+
+```{r clin-hrs-responders-cat2}
+#| code-fold: true
+#| code-summary: "Show code — HRS clinical course by hrs_responders_cat_2"
+make_table(hrs_clinical_course_variables, cohort, "hrs_responders_cat_2", "hrs_clinical_by_hrs_responders_cat_2",
+           cat_vars = cat_hrs_clinical_course_variables, family = "HRS clinical course",
+           caption = "HRS clinical course by hrs_responders_cat_2 (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/hrs_clinical_by_hrs_responders_cat_2.xlsx)
+
+```{r clin-death90}
+#| code-fold: true
+#| code-summary: "Show code — HRS clinical course by time_to_death_status_90days"
+make_table(hrs_clinical_course_variables, cohort, "time_to_death_status_90days", "hrs_clinical_by_time_to_death_status_90days",
+           cat_vars = cat_hrs_clinical_course_variables, family = "HRS clinical course",
+           caption = "HRS clinical course by time_to_death_status_90days (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/hrs_clinical_by_time_to_death_status_90days.xlsx)
+
+```{r clin-criteria3}
+#| code-fold: true
+#| code-summary: "Show code — HRS clinical course by HRS_criteria_3"
+make_table(hrs_clinical_course_variables, cohort, "HRS_criteria_3", "hrs_clinical_by_HRS_criteria_3",
+           cat_vars = cat_hrs_clinical_course_variables, family = "HRS clinical course",
+           caption = "HRS clinical course by HRS_criteria_3 (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/hrs_clinical_by_HRS_criteria_3.xlsx)
+
+```{r clin-criteria-meld}
+#| code-fold: true
+#| code-summary: "Show code — HRS clinical course by HRS_criteria_meld"
+make_table(hrs_clinical_course_variables, cohort, "HRS_criteria_meld", "hrs_clinical_by_HRS_criteria_meld",
+           cat_vars = cat_hrs_clinical_course_variables, family = "HRS clinical course",
+           caption = "HRS clinical course by HRS_criteria_meld (bolus + HRS-criteria cohort)")
+```
+
+[Download Excel](tables/hrs_clinical_by_HRS_criteria_meld.xlsx)
+
+# Adverse events
+
+In this cohort `HRS_Criteria` and `terli_route_day0` are constant by definition, so the original "AE by HRS_Criteria" and "AE by terli_route_day0" tables collapse to the same single-column table: AEs in the whole cohort.
+
+```{r ae-overall}
+#| code-fold: true
+#| code-summary: "Show code — AE overall"
+make_table(ae_vars, cohort, strata = NULL, "ae_overall",
+           cat_vars = ae_vars, family = "AE",
+           caption = "Adverse events - whole cohort (replaces 'AE by HRS_Criteria' and 'AE by terli_route_day0', which are constant here)")
+```
+
+[Download Excel](tables/ae_overall.xlsx)
+
+```{r ae-criteria3}
+#| code-fold: true
+#| code-summary: "Show code — AE by HRS_criteria_3"
+make_table(ae_vars, cohort, "HRS_criteria_3", "ae_by_HRS_criteria_3",
+           cat_vars = ae_vars, family = "AE",
+           exact = setdiff(ae_vars, c("terli_ae_respfail", "any_ae")),
+           caption = "Adverse events by HRS_criteria_3 (Fisher's exact except any_ae / terli_ae_respfail, as in Tables.Rmd)")
+```
+
+[Download Excel](tables/ae_by_HRS_criteria_3.xlsx)
+
+```{r ae-criteria-meld}
+#| code-fold: true
+#| code-summary: "Show code — AE by HRS_criteria_meld"
+make_table(ae_vars, cohort, "HRS_criteria_meld", "ae_by_HRS_criteria_meld",
+           cat_vars = ae_vars, family = "AE",
+           exact = setdiff(ae_vars, c("terli_ae_respfail", "any_ae")),
+           caption = "Adverse events by HRS_criteria_meld (Fisher's exact except any_ae / terli_ae_respfail, as in Tables.Rmd)")
+```
+
+[Download Excel](tables/ae_by_HRS_criteria_meld.xlsx)
+
+```{r ae-criteria2}
+#| code-fold: true
+#| code-summary: "Show code — AE by criteria_2 (ACLF grade >= 3)"
+make_table(ae_vars, cohort, "criteria_2", "ae_by_criteria_2",
+           cat_vars = ae_vars, family = "AE", exact = ae_vars,
+           caption = "Adverse events by criteria_2 (ACLF grade >= 3); Fisher's exact for all AE variables, as in Tables.Rmd")
+```
+
+[Download Excel](tables/ae_by_criteria_2.xlsx)
+
+```{r ae-meld35}
+#| code-fold: true
+#| code-summary: "Show code — AE by MELD 3.0 >= 35"
+make_table(ae_vars, cohort, "meld_35", "ae_by_meld_35",
+           cat_vars = ae_vars, family = "AE", exact = ae_vars,
+           caption = "Adverse events by admission MELD 3.0 >= 35 (non-imputed admit_meld_3_raw); Fisher's exact for all AE variables, as in Tables.Rmd")
+```
+
+[Download Excel](tables/ae_by_meld_35.xlsx)
+
+# MAP change (days 0-3) by HRS response
+
+Mean of the four daily MAP readings per day, then day 2 - day 0 and day 3 - day 0 differences, by `hrs_responders_cat_2` — the same computation as `Table_T1_map_diff.csv`. As in the original, MAP readings recorded as `0` ("not measured" placeholders) are averaged in (shared-pipeline bug S3 note); day 1 is omitted as in the original.
+
+```{r map-diff}
+#| code-fold: true
+#| code-summary: "Show code — MAP differences by hrs_responders_cat_2"
+map_wide <- cohort %>%
+  filter(!is.na(hrs_responders_cat_2)) %>%
+  pivot_longer(
+    cols = matches("^map_terli_day\\d+_time\\d+$"),
+    names_to = c("day", "time"),
+    names_pattern = "^map_terli_day(\\d+)_time(\\d+)$",
+    values_to = "map"
+  ) %>%
+  mutate(day = as.numeric(day)) %>%
+  filter(day <= 3) %>%
+  group_by(subjectid, day) %>%
+  summarise(map = mean(map, na.rm = TRUE), .groups = "drop") %>%
+  pivot_wider(id_cols = subjectid, names_from = day, values_from = map,
+              names_prefix = "map_day_") %>%
+  left_join(cohort %>% select(subjectid, hrs_responders_cat_2), by = "subjectid") %>%
+  mutate(
+    map_diff_day3_0 = map_day_3 - map_day_0,
+    map_diff_day2_0 = map_day_2 - map_day_0
+  )
+
+make_table(
+  c("map_day_0", "map_day_2", "map_day_3", "map_diff_day3_0", "map_diff_day2_0"),
+  map_wide, "hrs_responders_cat_2", "map_diff_by_hrs_responders_cat_2",
+  family = "MAP",
+  caption = "Mean MAP by day and change from day 0, by hrs_responders_cat_2 (bolus + HRS-criteria cohort)"
+)
+```
+
+[Download Excel](tables/map_diff_by_hrs_responders_cat_2.xlsx)
+
+# Run notes
+
+Variables dropped or stratifiers collapsed while building the tables above, recorded automatically:
+
+```{r run-notes}
+#| code-fold: true
+#| code-summary: "Show code — run notes"
+#| results: asis
+if (length(run_notes) == 0) {
+  cat("No variables were dropped and no stratifiers collapsed.\n")
+} else {
+  cat(paste0("- ", unique(run_notes)), sep = "\n")
+}
+```

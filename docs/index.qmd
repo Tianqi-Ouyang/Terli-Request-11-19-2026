@@ -1,0 +1,59 @@
+---
+title: "Request 11/19/2026 — All Tables, Bolus + HRS Criteria Cohort"
+date: last-modified
+---
+
+## Project Summary
+
+Data request (11/19/2026) for the HARMONY Terlipressin Registry: regenerate **every table produced by `Tables.Rmd`** (`/Users/to909/Desktop/Tables`), restricted to the cohort with
+
+- **`terli_route_day0 == 1`** — terlipressin initiated as **bolus** on day 0, and
+- **`HRS_Criteria == 1`** — at least one of criteria 1–4 met:
+  - `criteria_1` discontinued day 1 with no day-1 dose
+  - `criteria_2` ACLF grade ≥ 3
+  - `criteria_3` day-0 SCr ≥ 5
+  - `criteria_4` SpO2/FiO2 < 357
+
+**N = 118** of 243 patients in the master dataset (`final_master_01282026.xlsx`, shared pipeline).
+
+All tables are on the [Analysis](analysis.qmd) page, each with a **downloadable Excel** file directly underneath (CSV copies are in `Results/` in the repo).
+
+## Tables produced
+
+| Family | Stratified by |
+|:-------|:--------------|
+| Table 1 (demographics & clinical) | `HRS_reversal_new`, `hrs_responders`, `hrs_responders_cat_2`, `time_to_death_status_90days`, `HRS_criteria_3`, `HRS_criteria_meld` |
+| Follow-up instrument | same six stratifiers |
+| Hospital course instrument | same six stratifiers |
+| HRS clinical course instrument | same six stratifiers |
+| Adverse events | overall, `HRS_criteria_3`, `HRS_criteria_meld`, `criteria_2` (ACLF ≥ 3), MELD 3.0 ≥ 35 |
+| MAP change days 0–3 | `hrs_responders_cat_2` |
+
+## What changed vs. the original Tables.Rmd output
+
+1. **Cohort restriction** — every table is computed on the bolus + HRS-criteria cohort (N = 118) instead of the full registry.
+2. **Data source** — tables are built from the cleaned master dataset via the shared pipeline (per project convention), not by re-merging the raw site CSVs from Dropbox as `Tables.Rmd` does.
+3. **Collapsed stratifiers** — "AE by `HRS_Criteria`" and "AE by `terli_route_day0`" are constant in this cohort by definition, so they are replaced by a single overall AE table.
+4. **One fixed cohort for every table** — the original applied `drop_na(HRS_reversal_new, hrs_responders)` midway through the document (see issue 2 below); here the cohort never changes, and rows missing a given stratifier are excluded only from that table (standard `tableone` behavior).
+5. **Downloads** — every table is downloadable as Excel from the Analysis page; CSVs are written to `Results/`.
+
+## Validation against the original tables
+
+As a fidelity check, the engine used here was pointed at the **full registry** (no cohort filter) and compared cell-by-cell against the most recent original outputs (Jan 2026): `table1_check_0128_HRS_criteria_meld.csv`, `table_followup_0128…`, `table_hospitalization_0128…`, `table_hrs_clinical_0128…`, and `ae by HRS_criteria_meld 2026.csv`. **All five tables reproduce exactly — 0 differing cells of 4,536** — after matching two cosmetic conventions: locale-dependent sorting of free-text levels (`en_US.UTF-8` collation) and blank-vs-`NA` p-value formatting for degenerate single-level variables. The only intended difference in the tables published here is the cohort restriction.
+
+## Issues found in Tables.Rmd while porting
+
+1. **INU site labeled as MCM** (`Tables.Rmd` line 63) — the INU file is read with `id = paste0("mcm_", row_number())`, so INU rows share the "mcm\_" prefix with Mayo Clinic MCM rows. The REDCap `subjectid` used for merges is unaffected (verified unique in the master dataset), so published tables were not affected, but the `id` field is wrong in `Tables.Rmd`.
+2. **Mid-document cohort change** (line 2029) — `final_master <- final_master %>% drop_na(HRS_reversal_new, hrs_responders)` runs before the KM section, and every table generated after it (all "ae by …" CSVs, the MAP table, and the 2026 "0128" CSVs) inherits that filter. **Verified harmless in the current data:** neither variable has missing values in the final dataset, so zero rows were dropped (all original CSVs show n = 243) — but it is a latent hazard if the response derivation ever changes. This rebuild uses one fixed cohort for every table instead.
+3. **Wrong variable list in two HTML tables** (lines 1990 and 2012) — the "numeric hospitalization course" `table1()` formulas were built from `num_hrs_clinical_course_variables`, so those HTML tables showed HRS-clinical variables instead of hospitalization variables. The CSV outputs were not affected.
+4. **Unassigned mutate in "ae by criteria_2"** (line 2323) — `final_master %>% mutate(criteria_2 = if_else(admit_meld_3_raw >= 35, …))` is never assigned; had it been, it would have overwritten the ACLF-based `criteria_2` with a MELD flag. The table actually stratified by the original ACLF-based `criteria_2`, which is what this rebuild does explicitly.
+5. **Trailing-space variable name** (line 1323) — `"mido_maxdose_before_terli "` (with a trailing space) duplicates the correctly spelled entry and was silently dropped by `tableone` every run. Removed here.
+6. **List duplicates / stray entries** — `time_to_death_90days` listed twice; `time_to_death_status` in both the numeric and categorical lists (treated as categorical); `dc_lt_90days` twice in the follow-up categorical list; `tips_1yr_days` named in the categorical list but never collected. Deduplicated here; no effect on values.
+7. **Follow-up availability flags not in the master dataset** — `dc_30scr_notavailable`, `dc_60scr_notavailable`, `dc_90scr_notavailable`, `dc_90scr_notavailable_lt`, `last_encounter_1yr`, `scr_available_1yr` are not columns in the master dataset (REDCap exports availability as `*___999` checkboxes). The original skipped them silently; here they are recorded in the Run notes on the Analysis page.
+8. **MAP "0" readings** — MAP values recorded as 0 ("not measured" placeholders) are averaged into the daily means in the MAP table (shared-pipeline bug S3). Kept identical to the original for comparability and flagged on the Analysis page.
+
+Dynamic notes from the actual run (variables dropped per table family, collapsed stratifiers) are printed in the **Run notes** section at the bottom of the [Analysis](analysis.qmd) page.
+
+## Build note
+
+The project folder is named `Request 11/19/2026` in Finder, which is `Request 11:19:2026` on disk — and Quarto's theme compiler fails on paths containing `:`. The site is therefore rendered through the colon-free symlink `Request-11-19-2026` that sits next to the folder (see `CLAUDE.md`).

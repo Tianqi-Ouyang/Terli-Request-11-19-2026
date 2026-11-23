@@ -1,0 +1,13 @@
+.DS_Store
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+docs/.quarto/
+docs/_site/
+docs/tables/
+docs/analysis_files/
+docs/shared_pipeline.R
+shared_pipeline.R
+
+.claude/
