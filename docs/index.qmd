@@ -26,12 +26,12 @@ All tables are on the [Analysis](analysis.qmd) page, each with a **downloadable 
 | Follow-up instrument | same six stratifiers |
 | Hospital course instrument | same six stratifiers |
 | HRS clinical course instrument | same six stratifiers |
-| Adverse events | overall, `HRS_criteria_3`, `HRS_criteria_meld`, `criteria_2` (ACLF ≥ 3), MELD 3.0 ≥ 35 |
+| Adverse events | overall, `hrs_responders_cat_2`, `HRS_criteria_3`, `HRS_criteria_meld`, `criteria_2` (ACLF ≥ 3), MELD 3.0 ≥ 35, subanalysis-cohort membership (in cohort n = 118 vs rest of registry n = 125; computed on all 243) |
 | MAP change days 0–3 | `hrs_responders_cat_2` |
 
 ## What changed vs. the original Tables.Rmd output
 
-1. **Cohort restriction** — every table is computed on the bolus + HRS-criteria cohort (N = 118) instead of the full registry.
+1. **Cohort restriction** — every table is computed on the bolus + HRS-criteria cohort (N = 118) instead of the full registry. The one exception (added 2026-11-24 by request) is the **AE by subanalysis-cohort membership** table, which compares the cohort (n = 118) against the rest of the registry (n = 125) and therefore runs on all 243 patients.
 2. **Data source** — tables are built from the cleaned master dataset via the shared pipeline (per project convention), not by re-merging the raw site CSVs from Dropbox as `Tables.Rmd` does.
 3. **Collapsed stratifiers** — "AE by `HRS_Criteria`" and "AE by `terli_route_day0`" are constant in this cohort by definition, so they are replaced by a single overall AE table.
 4. **One fixed cohort for every table** — the original applied `drop_na(HRS_reversal_new, hrs_responders)` midway through the document (see issue 2 below); here the cohort never changes, and rows missing a given stratifier are excluded only from that table (standard `tableone` behavior).

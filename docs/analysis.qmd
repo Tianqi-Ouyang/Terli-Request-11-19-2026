@@ -607,6 +607,16 @@ make_table(ae_vars, cohort, strata = NULL, "ae_overall",
 
 [Download Excel](tables/ae_overall.xlsx)
 
+```{r ae-hrs-responders-cat2}
+#| code-fold: true
+#| code-summary: "Show code — AE by hrs_responders_cat_2"
+make_table(ae_vars, cohort, "hrs_responders_cat_2", "ae_by_hrs_responders_cat_2",
+           cat_vars = ae_vars, family = "AE", exact = ae_vars,
+           caption = "Adverse events by hrs_responders_cat_2 (0 = no response, 1 = partial/full response); Fisher's exact for all AE variables")
+```
+
+[Download Excel](tables/ae_by_hrs_responders_cat_2.xlsx)
+
 ```{r ae-criteria3}
 #| code-fold: true
 #| code-summary: "Show code — AE by HRS_criteria_3"
@@ -648,6 +658,27 @@ make_table(ae_vars, cohort, "meld_35", "ae_by_meld_35",
 ```
 
 [Download Excel](tables/ae_by_meld_35.xlsx)
+
+## AE by subanalysis-cohort membership (full registry, N = 243)
+
+Added 2026-11-24 by request: the same AE variables compared between the patients **in** this subanalysis cohort (`terli_route_day0 == 1` & `HRS_Criteria == 1`, n = 118) and the **rest of the registry** (n = 125: bolus without criteria n = 89, continuous with criteria n = 13, continuous without criteria n = 23). This is the one table on this page computed on all 243 patients. Neither `terli_route_day0` nor `HRS_Criteria` has missing values, so the two groups partition the registry exactly.
+
+```{r ae-cohort-membership}
+#| code-fold: true
+#| code-summary: "Show code — AE by cohort membership (full registry)"
+master_ae <- master %>%
+  mutate(in_cohort = factor(
+    if_else(terli_route_day0 == 1 & HRS_Criteria == 1,
+            "Bolus + >=1 criteria (n=118)", "Rest of registry (n=125)"),
+    levels = c("Bolus + >=1 criteria (n=118)", "Rest of registry (n=125)")
+  ))
+
+make_table(ae_vars, master_ae, "in_cohort", "ae_by_cohort_membership",
+           cat_vars = ae_vars, family = "AE (full registry)", exact = ae_vars,
+           caption = "Adverse events by subanalysis-cohort membership (full registry, N = 243); Fisher's exact for all AE variables")
+```
+
+[Download Excel](tables/ae_by_cohort_membership.xlsx)
 
 # MAP change (days 0-3) by HRS response
 
