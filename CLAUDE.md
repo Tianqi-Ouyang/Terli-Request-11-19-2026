@@ -28,7 +28,9 @@ Shared context (master dataset path, derived variables, conventions) lives in th
 Four `tableone` families (Table 1, follow-up, hospital course, HRS clinical course),
 each stratified by `HRS_reversal_new`, `hrs_responders`, `hrs_responders_cat_2`,
 `time_to_death_status_90days`, `HRS_criteria_3`, `HRS_criteria_meld`; AE tables
-(overall, `HRS_criteria_3`, `HRS_criteria_meld`, `criteria_2`, MELD 3.0 ≥ 35);
+(overall, `HRS_criteria_3`, `HRS_criteria_meld`, `criteria_2`, MELD 3.0 ≥ 35; plus,
+in their own "added 11/24/2026" section: `hrs_responders_cat_2` and
+subanalysis-cohort membership, n = 118 vs n = 125 on all 243);
 and the MAP day 0–3 change table by `hrs_responders_cat_2`.
 
 `make_table()` in `docs/analysis.qmd` reproduces the original `create_table_one()`
