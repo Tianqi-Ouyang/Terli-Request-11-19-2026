@@ -164,9 +164,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#follow-up-instrument" id="toc-follow-up-instrument" class="nav-link" data-scroll-target="#follow-up-instrument">Follow-up instrument</a></li>
   <li><a href="#hospital-course-instrument" id="toc-hospital-course-instrument" class="nav-link" data-scroll-target="#hospital-course-instrument">Hospital course instrument</a></li>
   <li><a href="#hrs-clinical-course-instrument" id="toc-hrs-clinical-course-instrument" class="nav-link" data-scroll-target="#hrs-clinical-course-instrument">HRS clinical course instrument</a></li>
-  <li><a href="#adverse-events" id="toc-adverse-events" class="nav-link" data-scroll-target="#adverse-events">Adverse events</a>
+  <li><a href="#adverse-events" id="toc-adverse-events" class="nav-link" data-scroll-target="#adverse-events">Adverse events</a></li>
+  <li><a href="#adverse-events-added-11242026" id="toc-adverse-events-added-11242026" class="nav-link" data-scroll-target="#adverse-events-added-11242026">Adverse events — added 11/24/2026</a>
   <ul class="collapse">
-  <li><a href="#ae-by-subanalysis-cohort-membership-full-registry-n-243" id="toc-ae-by-subanalysis-cohort-membership-full-registry-n-243" class="nav-link" data-scroll-target="#ae-by-subanalysis-cohort-membership-full-registry-n-243">AE by subanalysis-cohort membership (full registry, N = 243)</a></li>
+  <li><a href="#ae-by-hrs-response-hrs_responders_cat_2-primary-outcome" id="toc-ae-by-hrs-response-hrs_responders_cat_2-primary-outcome" class="nav-link" data-scroll-target="#ae-by-hrs-response-hrs_responders_cat_2-primary-outcome">AE by HRS response — <code>hrs_responders_cat_2</code> (primary outcome)</a></li>
+  <li><a href="#ae-by-subanalysis-cohort-membership-in-cohort-n-118-vs-rest-of-registry-n-125" id="toc-ae-by-subanalysis-cohort-membership-in-cohort-n-118-vs-rest-of-registry-n-125" class="nav-link" data-scroll-target="#ae-by-subanalysis-cohort-membership-in-cohort-n-118-vs-rest-of-registry-n-125">AE by subanalysis-cohort membership — in cohort (n = 118) vs rest of registry (n = 125)</a></li>
   </ul></li>
   <li><a href="#map-change-days-0-3-by-hrs-response" id="toc-map-change-days-0-3-by-hrs-response" class="nav-link" data-scroll-target="#map-change-days-0-3-by-hrs-response">MAP change (days 0-3) by HRS response</a></li>
   <li><a href="#run-notes" id="toc-run-notes" class="nav-link" data-scroll-target="#run-notes">Run notes</a></li>
@@ -38099,239 +38101,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><a href="tables/ae_overall.xlsx">Download Excel</a></p>
 <div class="cell">
 <details class="code-fold">
-<summary>Show code — AE by hrs_responders_cat_2</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make_table</span>(ae_vars, cohort, <span class="st">"hrs_responders_cat_2"</span>, <span class="st">"ae_by_hrs_responders_cat_2"</span>,</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">cat_vars =</span> ae_vars, <span class="at">family =</span> <span class="st">"AE"</span>, <span class="at">exact =</span> ae_vars,</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">caption =</span> <span class="st">"Adverse events by hrs_responders_cat_2 (0 = no response, 1 = partial/full response); Fisher's exact for all AE variables"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Adverse events by hrs_responders_cat_2 (0 = no response, 1 = partial/full response); Fisher’s exact for all AE variables</caption>
-<colgroup>
-<col style="width: 27%">
-<col style="width: 7%">
-<col style="width: 13%">
-<col style="width: 12%">
-<col style="width: 13%">
-<col style="width: 7%">
-<col style="width: 7%">
-<col style="width: 10%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: left;">level</th>
-<th style="text-align: left;">Overall</th>
-<th style="text-align: left;">0</th>
-<th style="text-align: left;">1</th>
-<th style="text-align: left;">p</th>
-<th style="text-align: left;">test</th>
-<th style="text-align: left;">Missing</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">n</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;">118</td>
-<td style="text-align: left;">61</td>
-<td style="text-align: left;">57</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">any_ae (%)</td>
-<td style="text-align: left;">0</td>
-<td style="text-align: left;">88 (74.6)</td>
-<td style="text-align: left;">41 (67.2)</td>
-<td style="text-align: left;">47 (82.5)</td>
-<td style="text-align: left;">0.090</td>
-<td style="text-align: left;">exact</td>
-<td style="text-align: left;">0.0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"></td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">30 (25.4)</td>
-<td style="text-align: left;">20 (32.8)</td>
-<td style="text-align: left;">10 (17.5)</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">terli_ae_abdpain (%)</td>
-<td style="text-align: left;">0</td>
-<td style="text-align: left;">112 (94.9)</td>
-<td style="text-align: left;">57 (93.4)</td>
-<td style="text-align: left;">55 (96.5)</td>
-<td style="text-align: left;">0.680</td>
-<td style="text-align: left;">exact</td>
-<td style="text-align: left;">0.0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"></td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">6 (5.1)</td>
-<td style="text-align: left;">4 (6.6)</td>
-<td style="text-align: left;">2 (3.5)</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">terli_ae_nausea (%)</td>
-<td style="text-align: left;">0</td>
-<td style="text-align: left;">112 (94.9)</td>
-<td style="text-align: left;">56 (91.8)</td>
-<td style="text-align: left;">56 (98.2)</td>
-<td style="text-align: left;">0.208</td>
-<td style="text-align: left;">exact</td>
-<td style="text-align: left;">0.0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"></td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">6 (5.1)</td>
-<td style="text-align: left;">5 (8.2)</td>
-<td style="text-align: left;">1 (1.8)</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">terli_ae_diarrhea (%)</td>
-<td style="text-align: left;">0</td>
-<td style="text-align: left;">116 (98.3)</td>
-<td style="text-align: left;">59 (96.7)</td>
-<td style="text-align: left;">57 (100.0)</td>
-<td style="text-align: left;">0.496</td>
-<td style="text-align: left;">exact</td>
-<td style="text-align: left;">0.0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"></td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">2 (1.7)</td>
-<td style="text-align: left;">2 (3.3)</td>
-<td style="text-align: left;">0 (0.0)</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">terli_ae_volover (%)</td>
-<td style="text-align: left;">0</td>
-<td style="text-align: left;">114 (96.6)</td>
-<td style="text-align: left;">59 (96.7)</td>
-<td style="text-align: left;">55 (96.5)</td>
-<td style="text-align: left;">1.000</td>
-<td style="text-align: left;">exact</td>
-<td style="text-align: left;">0.0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"></td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">4 (3.4)</td>
-<td style="text-align: left;">2 (3.3)</td>
-<td style="text-align: left;">2 (3.5)</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">terli_ae_brady (%)</td>
-<td style="text-align: left;">0</td>
-<td style="text-align: left;">113 (95.8)</td>
-<td style="text-align: left;">59 (96.7)</td>
-<td style="text-align: left;">54 (94.7)</td>
-<td style="text-align: left;">0.672</td>
-<td style="text-align: left;">exact</td>
-<td style="text-align: left;">0.0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"></td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">5 (4.2)</td>
-<td style="text-align: left;">2 (3.3)</td>
-<td style="text-align: left;">3 (5.3)</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">terli_7 (%)</td>
-<td style="text-align: left;">0</td>
-<td style="text-align: left;">108 (91.5)</td>
-<td style="text-align: left;">53 (86.9)</td>
-<td style="text-align: left;">55 (96.5)</td>
-<td style="text-align: left;">0.096</td>
-<td style="text-align: left;">exact</td>
-<td style="text-align: left;">0.0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"></td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">10 (8.5)</td>
-<td style="text-align: left;">8 (13.1)</td>
-<td style="text-align: left;">2 (3.5)</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">terli_8 (%)</td>
-<td style="text-align: left;">0</td>
-<td style="text-align: left;">116 (98.3)</td>
-<td style="text-align: left;">60 (98.4)</td>
-<td style="text-align: left;">56 (98.2)</td>
-<td style="text-align: left;">1.000</td>
-<td style="text-align: left;">exact</td>
-<td style="text-align: left;">0.0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"></td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">2 (1.7)</td>
-<td style="text-align: left;">1 (1.6)</td>
-<td style="text-align: left;">1 (1.8)</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">terli_ae_respfail (%)</td>
-<td style="text-align: left;">0</td>
-<td style="text-align: left;">104 (88.1)</td>
-<td style="text-align: left;">51 (83.6)</td>
-<td style="text-align: left;">53 (93.0)</td>
-<td style="text-align: left;">0.157</td>
-<td style="text-align: left;">exact</td>
-<td style="text-align: left;">0.0</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"></td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">14 (11.9)</td>
-<td style="text-align: left;">10 (16.4)</td>
-<td style="text-align: left;">4 (7.0)</td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-<td style="text-align: left;"></td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p><a href="tables/ae_by_hrs_responders_cat_2.xlsx">Download Excel</a></p>
-<div class="cell">
-<details class="code-fold">
 <summary>Show code — AE by HRS_criteria_3</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make_table</span>(ae_vars, cohort, <span class="st">"HRS_criteria_3"</span>, <span class="st">"ae_by_HRS_criteria_3"</span>,</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">cat_vars =</span> ae_vars, <span class="at">family =</span> <span class="st">"AE"</span>,</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">exact =</span> <span class="fu">setdiff</span>(ae_vars, <span class="fu">c</span>(<span class="st">"terli_ae_respfail"</span>, <span class="st">"any_ae"</span>)),</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">caption =</span> <span class="st">"Adverse events by HRS_criteria_3 (Fisher's exact except any_ae / terli_ae_respfail, as in Tables.Rmd)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make_table</span>(ae_vars, cohort, <span class="st">"HRS_criteria_3"</span>, <span class="st">"ae_by_HRS_criteria_3"</span>,</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">cat_vars =</span> ae_vars, <span class="at">family =</span> <span class="st">"AE"</span>,</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">exact =</span> <span class="fu">setdiff</span>(ae_vars, <span class="fu">c</span>(<span class="st">"terli_ae_respfail"</span>, <span class="st">"any_ae"</span>)),</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">caption =</span> <span class="st">"Adverse events by HRS_criteria_3 (Fisher's exact except any_ae / terli_ae_respfail, as in Tables.Rmd)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -38557,10 +38331,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Show code — AE by HRS_criteria_meld</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make_table</span>(ae_vars, cohort, <span class="st">"HRS_criteria_meld"</span>, <span class="st">"ae_by_HRS_criteria_meld"</span>,</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">cat_vars =</span> ae_vars, <span class="at">family =</span> <span class="st">"AE"</span>,</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">exact =</span> <span class="fu">setdiff</span>(ae_vars, <span class="fu">c</span>(<span class="st">"terli_ae_respfail"</span>, <span class="st">"any_ae"</span>)),</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">caption =</span> <span class="st">"Adverse events by HRS_criteria_meld (Fisher's exact except any_ae / terli_ae_respfail, as in Tables.Rmd)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make_table</span>(ae_vars, cohort, <span class="st">"HRS_criteria_meld"</span>, <span class="st">"ae_by_HRS_criteria_meld"</span>,</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">cat_vars =</span> ae_vars, <span class="at">family =</span> <span class="st">"AE"</span>,</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">exact =</span> <span class="fu">setdiff</span>(ae_vars, <span class="fu">c</span>(<span class="st">"terli_ae_respfail"</span>, <span class="st">"any_ae"</span>)),</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">caption =</span> <span class="st">"Adverse events by HRS_criteria_meld (Fisher's exact except any_ae / terli_ae_respfail, as in Tables.Rmd)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -38786,9 +38560,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Show code — AE by criteria_2 (ACLF grade &gt;= 3)</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make_table</span>(ae_vars, cohort, <span class="st">"criteria_2"</span>, <span class="st">"ae_by_criteria_2"</span>,</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">cat_vars =</span> ae_vars, <span class="at">family =</span> <span class="st">"AE"</span>, <span class="at">exact =</span> ae_vars,</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">caption =</span> <span class="st">"Adverse events by criteria_2 (ACLF grade &gt;= 3); Fisher's exact for all AE variables, as in Tables.Rmd"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make_table</span>(ae_vars, cohort, <span class="st">"criteria_2"</span>, <span class="st">"ae_by_criteria_2"</span>,</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">cat_vars =</span> ae_vars, <span class="at">family =</span> <span class="st">"AE"</span>, <span class="at">exact =</span> ae_vars,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">caption =</span> <span class="st">"Adverse events by criteria_2 (ACLF grade &gt;= 3); Fisher's exact for all AE variables, as in Tables.Rmd"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -39014,9 +38788,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Show code — AE by MELD 3.0 &gt;= 35</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make_table</span>(ae_vars, cohort, <span class="st">"meld_35"</span>, <span class="st">"ae_by_meld_35"</span>,</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">cat_vars =</span> ae_vars, <span class="at">family =</span> <span class="st">"AE"</span>, <span class="at">exact =</span> ae_vars,</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">caption =</span> <span class="st">"Adverse events by admission MELD 3.0 &gt;= 35 (non-imputed admit_meld_3_raw); Fisher's exact for all AE variables, as in Tables.Rmd"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make_table</span>(ae_vars, cohort, <span class="st">"meld_35"</span>, <span class="st">"ae_by_meld_35"</span>,</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">cat_vars =</span> ae_vars, <span class="at">family =</span> <span class="st">"AE"</span>, <span class="at">exact =</span> ae_vars,</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">caption =</span> <span class="st">"Adverse events by admission MELD 3.0 &gt;= 35 (non-imputed admit_meld_3_raw); Fisher's exact for all AE variables, as in Tables.Rmd"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
@@ -39239,9 +39013,245 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p><a href="tables/ae_by_meld_35.xlsx">Download Excel</a></p>
-<section id="ae-by-subanalysis-cohort-membership-full-registry-n-243" class="level2">
-<h2 class="anchored" data-anchor-id="ae-by-subanalysis-cohort-membership-full-registry-n-243">AE by subanalysis-cohort membership (full registry, N = 243)</h2>
-<p>Added 2026-11-24 by request: the same AE variables compared between the patients <strong>in</strong> this subanalysis cohort (<code>terli_route_day0 == 1</code> &amp; <code>HRS_Criteria == 1</code>, n = 118) and the <strong>rest of the registry</strong> (n = 125: bolus without criteria n = 89, continuous with criteria n = 13, continuous without criteria n = 23). This is the one table on this page computed on all 243 patients. Neither <code>terli_route_day0</code> nor <code>HRS_Criteria</code> has missing values, so the two groups partition the registry exactly.</p>
+</section>
+<section id="adverse-events-added-11242026" class="level1">
+<h1>Adverse events — added 11/24/2026</h1>
+<p>The two adverse-event tables from the 11/24/2026 follow-up request, in their own labeled section.</p>
+<section id="ae-by-hrs-response-hrs_responders_cat_2-primary-outcome" class="level2">
+<h2 class="anchored" data-anchor-id="ae-by-hrs-response-hrs_responders_cat_2-primary-outcome">AE by HRS response — <code>hrs_responders_cat_2</code> (primary outcome)</h2>
+<p>Within the bolus + HRS-criteria cohort (N = 118): <strong>0 = no response</strong> (n = 61) vs <strong>1 = partial or full response</strong> (n = 57).</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show code — AE by hrs_responders_cat_2</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make_table</span>(ae_vars, cohort, <span class="st">"hrs_responders_cat_2"</span>, <span class="st">"ae_by_hrs_responders_cat_2"</span>,</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">cat_vars =</span> ae_vars, <span class="at">family =</span> <span class="st">"AE"</span>, <span class="at">exact =</span> ae_vars,</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">caption =</span> <span class="st">"Adverse events by hrs_responders_cat_2 (0 = no response, 1 = partial/full response); Fisher's exact for all AE variables"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Adverse events by hrs_responders_cat_2 (0 = no response, 1 = partial/full response); Fisher’s exact for all AE variables</caption>
+<colgroup>
+<col style="width: 27%">
+<col style="width: 7%">
+<col style="width: 13%">
+<col style="width: 12%">
+<col style="width: 13%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">level</th>
+<th style="text-align: left;">Overall</th>
+<th style="text-align: left;">0</th>
+<th style="text-align: left;">1</th>
+<th style="text-align: left;">p</th>
+<th style="text-align: left;">test</th>
+<th style="text-align: left;">Missing</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">n</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">118</td>
+<td style="text-align: left;">61</td>
+<td style="text-align: left;">57</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">any_ae (%)</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">88 (74.6)</td>
+<td style="text-align: left;">41 (67.2)</td>
+<td style="text-align: left;">47 (82.5)</td>
+<td style="text-align: left;">0.090</td>
+<td style="text-align: left;">exact</td>
+<td style="text-align: left;">0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">30 (25.4)</td>
+<td style="text-align: left;">20 (32.8)</td>
+<td style="text-align: left;">10 (17.5)</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">terli_ae_abdpain (%)</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">112 (94.9)</td>
+<td style="text-align: left;">57 (93.4)</td>
+<td style="text-align: left;">55 (96.5)</td>
+<td style="text-align: left;">0.680</td>
+<td style="text-align: left;">exact</td>
+<td style="text-align: left;">0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">6 (5.1)</td>
+<td style="text-align: left;">4 (6.6)</td>
+<td style="text-align: left;">2 (3.5)</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">terli_ae_nausea (%)</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">112 (94.9)</td>
+<td style="text-align: left;">56 (91.8)</td>
+<td style="text-align: left;">56 (98.2)</td>
+<td style="text-align: left;">0.208</td>
+<td style="text-align: left;">exact</td>
+<td style="text-align: left;">0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">6 (5.1)</td>
+<td style="text-align: left;">5 (8.2)</td>
+<td style="text-align: left;">1 (1.8)</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">terli_ae_diarrhea (%)</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">116 (98.3)</td>
+<td style="text-align: left;">59 (96.7)</td>
+<td style="text-align: left;">57 (100.0)</td>
+<td style="text-align: left;">0.496</td>
+<td style="text-align: left;">exact</td>
+<td style="text-align: left;">0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2 (1.7)</td>
+<td style="text-align: left;">2 (3.3)</td>
+<td style="text-align: left;">0 (0.0)</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">terli_ae_volover (%)</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">114 (96.6)</td>
+<td style="text-align: left;">59 (96.7)</td>
+<td style="text-align: left;">55 (96.5)</td>
+<td style="text-align: left;">1.000</td>
+<td style="text-align: left;">exact</td>
+<td style="text-align: left;">0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">4 (3.4)</td>
+<td style="text-align: left;">2 (3.3)</td>
+<td style="text-align: left;">2 (3.5)</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">terli_ae_brady (%)</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">113 (95.8)</td>
+<td style="text-align: left;">59 (96.7)</td>
+<td style="text-align: left;">54 (94.7)</td>
+<td style="text-align: left;">0.672</td>
+<td style="text-align: left;">exact</td>
+<td style="text-align: left;">0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">5 (4.2)</td>
+<td style="text-align: left;">2 (3.3)</td>
+<td style="text-align: left;">3 (5.3)</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">terli_7 (%)</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">108 (91.5)</td>
+<td style="text-align: left;">53 (86.9)</td>
+<td style="text-align: left;">55 (96.5)</td>
+<td style="text-align: left;">0.096</td>
+<td style="text-align: left;">exact</td>
+<td style="text-align: left;">0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">10 (8.5)</td>
+<td style="text-align: left;">8 (13.1)</td>
+<td style="text-align: left;">2 (3.5)</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">terli_8 (%)</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">116 (98.3)</td>
+<td style="text-align: left;">60 (98.4)</td>
+<td style="text-align: left;">56 (98.2)</td>
+<td style="text-align: left;">1.000</td>
+<td style="text-align: left;">exact</td>
+<td style="text-align: left;">0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">2 (1.7)</td>
+<td style="text-align: left;">1 (1.6)</td>
+<td style="text-align: left;">1 (1.8)</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">terli_ae_respfail (%)</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">104 (88.1)</td>
+<td style="text-align: left;">51 (83.6)</td>
+<td style="text-align: left;">53 (93.0)</td>
+<td style="text-align: left;">0.157</td>
+<td style="text-align: left;">exact</td>
+<td style="text-align: left;">0.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">14 (11.9)</td>
+<td style="text-align: left;">10 (16.4)</td>
+<td style="text-align: left;">4 (7.0)</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><a href="tables/ae_by_hrs_responders_cat_2.xlsx">Download Excel</a></p>
+</section>
+<section id="ae-by-subanalysis-cohort-membership-in-cohort-n-118-vs-rest-of-registry-n-125" class="level2">
+<h2 class="anchored" data-anchor-id="ae-by-subanalysis-cohort-membership-in-cohort-n-118-vs-rest-of-registry-n-125">AE by subanalysis-cohort membership — in cohort (n = 118) vs rest of registry (n = 125)</h2>
+<p>The same AE variables compared between the patients <strong>in</strong> this subanalysis cohort (<code>terli_route_day0 == 1</code> &amp; <code>HRS_Criteria == 1</code>, n = 118) and the <strong>rest of the registry</strong> (n = 125: bolus without criteria n = 89, continuous with criteria n = 13, continuous without criteria n = 23). This is the one table on this page computed on all 243 patients. Neither <code>terli_route_day0</code> nor <code>HRS_Criteria</code> has missing values, so the two groups partition the registry exactly.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show code — AE by cohort membership (full registry)</summary>
