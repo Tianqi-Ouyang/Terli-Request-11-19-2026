@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-11-23">
+<meta name="dcterms.date" content="2026-11-24">
 
 <title>Request 11/19/2026 — All Tables, Bolus + HRS Criteria Cohort – Terlipressin — Request 11/19/2026</title>
 <style>
@@ -149,7 +149,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">November 23, 2026</p>
+      <p class="date">November 24, 2026</p>
     </div>
   </div>
   
@@ -209,7 +209,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Adverse events</td>
-<td style="text-align: left;">overall, <code>HRS_criteria_3</code>, <code>HRS_criteria_meld</code>, <code>criteria_2</code> (ACLF ≥ 3), MELD 3.0 ≥ 35</td>
+<td style="text-align: left;">overall, <code>hrs_responders_cat_2</code>, <code>HRS_criteria_3</code>, <code>HRS_criteria_meld</code>, <code>criteria_2</code> (ACLF ≥ 3), MELD 3.0 ≥ 35, subanalysis-cohort membership (in cohort n = 118 vs rest of registry n = 125; computed on all 243)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">MAP change days 0–3</td>
@@ -221,7 +221,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="what-changed-vs.-the-original-tables.rmd-output" class="level2">
 <h2 class="anchored" data-anchor-id="what-changed-vs.-the-original-tables.rmd-output">What changed vs.&nbsp;the original Tables.Rmd output</h2>
 <ol type="1">
-<li><strong>Cohort restriction</strong> — every table is computed on the bolus + HRS-criteria cohort (N = 118) instead of the full registry.</li>
+<li><strong>Cohort restriction</strong> — every table is computed on the bolus + HRS-criteria cohort (N = 118) instead of the full registry. The one exception (added 2026-11-24 by request) is the <strong>AE by subanalysis-cohort membership</strong> table, which compares the cohort (n = 118) against the rest of the registry (n = 125) and therefore runs on all 243 patients.</li>
 <li><strong>Data source</strong> — tables are built from the cleaned master dataset via the shared pipeline (per project convention), not by re-merging the raw site CSVs from Dropbox as <code>Tables.Rmd</code> does.</li>
 <li><strong>Collapsed stratifiers</strong> — “AE by <code>HRS_Criteria</code>” and “AE by <code>terli_route_day0</code>” are constant in this cohort by definition, so they are replaced by a single overall AE table.</li>
 <li><strong>One fixed cohort for every table</strong> — the original applied <code>drop_na(HRS_reversal_new, hrs_responders)</code> midway through the document (see issue 2 below); here the cohort never changes, and rows missing a given stratifier are excluded only from that table (standard <code>tableone</code> behavior).</li>
