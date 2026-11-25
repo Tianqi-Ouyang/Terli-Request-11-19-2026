@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-11-24">
+<meta name="dcterms.date" content="2026-11-25">
 
-<title>Request 11/19/2026 — All Tables, Bolus + HRS Criteria Cohort – Terlipressin — Request 11/19/2026</title>
+<title>Request 11/19/2026 — All Tables, Bolus + HRS_criteria_3 = 0 Cohort – Terlipressin — Request 11/19/2026</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -138,7 +138,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Request 11/19/2026 — All Tables, Bolus + HRS Criteria Cohort</h1>
+<h1 class="title">Request 11/19/2026 — All Tables, Bolus + HRS_criteria_3 = 0 Cohort</h1>
 </div>
 
 
@@ -149,7 +149,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">November 24, 2026</p>
+      <p class="date">November 25, 2026</p>
     </div>
   </div>
   
@@ -166,15 +166,17 @@ ul.task-list li input[type="checkbox"] {
 <p>Data request (11/19/2026) for the HARMONY Terlipressin Registry: regenerate <strong>every table produced by <code>Tables.Rmd</code></strong> (<code>/Users/to909/Desktop/Tables</code>), restricted to the cohort with</p>
 <ul>
 <li><strong><code>terli_route_day0 == 1</code></strong> — terlipressin initiated as <strong>bolus</strong> on day 0, and</li>
-<li><strong><code>HRS_Criteria == 1</code></strong> — at least one of criteria 1–4 met:
+<li><strong><code>HRS_criteria_3 == 0</code></strong> — <strong>none</strong> of criteria 2–4 met:
 <ul>
-<li><code>criteria_1</code> discontinued day 1 with no day-1 dose</li>
 <li><code>criteria_2</code> ACLF grade ≥ 3</li>
 <li><code>criteria_3</code> day-0 SCr ≥ 5</li>
 <li><code>criteria_4</code> SpO2/FiO2 &lt; 357</li>
 </ul></li>
 </ul>
-<p><strong>N = 118</strong> of 243 patients in the master dataset (<code>final_master_01282026.xlsx</code>, shared pipeline).</p>
+<p><strong>N = 101</strong> of 243 patients in the master dataset (<code>final_master_01282026.xlsx</code>, shared pipeline).</p>
+<blockquote class="blockquote">
+<p><strong>Cohort corrected 11/25/2026</strong> — the initial run used <code>terli_route_day0 == 1</code> &amp; <code>HRS_Criteria == 1</code> (≥ 1 of criteria 1–4; N = 118). The correct restriction is <code>HRS_criteria_3 == 0</code> (N = 101); every table on this site has been regenerated on the corrected cohort. Only 12 patients belong to both cohorts.</p>
+</blockquote>
 <p>All tables are on the <a href="./analysis.html">Analysis</a> page, each with a <strong>downloadable Excel</strong> file directly underneath (CSV copies are in <code>Results/</code> in the repo).</p>
 </section>
 <section id="tables-produced" class="level2">
@@ -209,11 +211,11 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Adverse events</td>
-<td style="text-align: left;">overall, <code>HRS_criteria_3</code>, <code>HRS_criteria_meld</code>, <code>criteria_2</code> (ACLF ≥ 3), MELD 3.0 ≥ 35</td>
+<td style="text-align: left;">overall, <code>HRS_Criteria</code> (≡ <code>criteria_1</code> here), <code>HRS_criteria_meld</code>, MELD 3.0 ≥ 35</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Adverse events — added 11/24/2026 (own section)</td>
-<td style="text-align: left;"><code>hrs_responders_cat_2</code> (primary outcome), subanalysis-cohort membership (in cohort n = 118 vs rest of registry n = 125; computed on all 243)</td>
+<td style="text-align: left;"><code>hrs_responders_cat_2</code> (primary outcome), subanalysis-cohort membership (in cohort n = 101 vs rest of registry n = 142; computed on all 243)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">MAP change days 0–3</td>
@@ -221,13 +223,14 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
+<p>In the corrected cohort <code>HRS_criteria_3</code> and <code>criteria_2</code> are 0 by definition, so the four “by <code>HRS_criteria_3</code>” tables show the overall column only, and “AE by <code>HRS_criteria_3</code>” / “AE by <code>criteria_2</code>” are dropped (the overall AE table covers them).</p>
 </section>
 <section id="what-changed-vs.-the-original-tables.rmd-output" class="level2">
 <h2 class="anchored" data-anchor-id="what-changed-vs.-the-original-tables.rmd-output">What changed vs.&nbsp;the original Tables.Rmd output</h2>
 <ol type="1">
-<li><strong>Cohort restriction</strong> — every table is computed on the bolus + HRS-criteria cohort (N = 118) instead of the full registry. The one exception (added 2026-11-24 by request) is the <strong>AE by subanalysis-cohort membership</strong> table, which compares the cohort (n = 118) against the rest of the registry (n = 125) and therefore runs on all 243 patients.</li>
+<li><strong>Cohort restriction</strong> — every table is computed on the bolus + HRS_criteria_3 = 0 cohort (N = 101) instead of the full registry. The one exception (added 2026-11-24 by request) is the <strong>AE by subanalysis-cohort membership</strong> table, which compares the cohort (n = 101) against the rest of the registry (n = 142) and therefore runs on all 243 patients.</li>
 <li><strong>Data source</strong> — tables are built from the cleaned master dataset via the shared pipeline (per project convention), not by re-merging the raw site CSVs from Dropbox as <code>Tables.Rmd</code> does.</li>
-<li><strong>Collapsed stratifiers</strong> — “AE by <code>HRS_Criteria</code>” and “AE by <code>terli_route_day0</code>” are constant in this cohort by definition, so they are replaced by a single overall AE table.</li>
+<li><strong>Collapsed stratifiers</strong> — <code>terli_route_day0</code>, <code>HRS_criteria_3</code> and <code>criteria_2</code> are constant in this cohort by definition: “AE by <code>terli_route_day0</code>”, “AE by <code>HRS_criteria_3</code>” and “AE by <code>criteria_2</code>” are replaced by a single overall AE table, “AE by <code>HRS_Criteria</code>” reduces to stratifying by <code>criteria_1</code> (early discontinuation), and the four “by <code>HRS_criteria_3</code>” tables show the overall column only.</li>
 <li><strong>One fixed cohort for every table</strong> — the original applied <code>drop_na(HRS_reversal_new, hrs_responders)</code> midway through the document (see issue 2 below); here the cohort never changes, and rows missing a given stratifier are excluded only from that table (standard <code>tableone</code> behavior).</li>
 <li><strong>Downloads</strong> — every table is downloadable as Excel from the Analysis page; CSVs are written to <code>Results/</code>.</li>
 </ol>
