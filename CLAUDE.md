@@ -4,12 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Request 11/19/2026 — All Tables.Rmd tables for the bolus + HRS-criteria cohort**
+**Request 11/19/2026 — All Tables.Rmd tables for the bolus + HRS_criteria_3 = 0 cohort**
 
 Sub-project of the HARMONY Terlipressin Registry. Regenerates every table from
 `/Users/to909/Desktop/Tables/Tables.Rmd` on the cohort restricted to
-`terli_route_day0 == 1` (bolus initiation) **and** `HRS_Criteria == 1`
-(≥1 of criteria 1–4). N = 118 of 243.
+`terli_route_day0 == 1` (bolus initiation) **and** `HRS_criteria_3 == 0`
+(none of criteria 2–4: ACLF ≥ 3, day-0 SCr ≥ 5, SpO2/FiO2 < 357). N = 101 of 243.
+Corrected 11/25/2026 from the initial `HRS_Criteria == 1` cohort (≥1 of criteria
+1–4, N = 118).
 
 Shared context (master dataset path, derived variables, conventions) lives in the parent
 `/Users/to909/Desktop/Terlipressin projects/CLAUDE.md` — do not duplicate that content here.
@@ -27,10 +29,11 @@ Shared context (master dataset path, derived variables, conventions) lives in th
 
 Four `tableone` families (Table 1, follow-up, hospital course, HRS clinical course),
 each stratified by `HRS_reversal_new`, `hrs_responders`, `hrs_responders_cat_2`,
-`time_to_death_status_90days`, `HRS_criteria_3`, `HRS_criteria_meld`; AE tables
-(overall, `HRS_criteria_3`, `HRS_criteria_meld`, `criteria_2`, MELD 3.0 ≥ 35; plus,
+`time_to_death_status_90days`, `HRS_criteria_3` (constant 0 in this cohort →
+overall column only), `HRS_criteria_meld`; AE tables
+(overall, `HRS_Criteria` (≡ `criteria_1` here), `HRS_criteria_meld`, MELD 3.0 ≥ 35; plus,
 in their own "added 11/24/2026" section: `hrs_responders_cat_2` and
-subanalysis-cohort membership, n = 118 vs n = 125 on all 243);
+subanalysis-cohort membership, n = 101 vs n = 142 on all 243);
 and the MAP day 0–3 change table by `hrs_responders_cat_2`.
 
 `make_table()` in `docs/analysis.qmd` reproduces the original `create_table_one()`

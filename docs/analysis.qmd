@@ -1,5 +1,5 @@
 ---
-title: "All Tables — Bolus + HRS Criteria Cohort"
+title: "All Tables — Bolus + HRS_criteria_3 = 0 Cohort"
 date: today
 execute:
   echo: true
@@ -7,7 +7,7 @@ execute:
   message: false
 ---
 
-Every table from `Tables.Rmd` (`/Users/to909/Desktop/Tables`), recomputed on the cohort restricted to **bolus terlipressin initiation (`terli_route_day0 == 1`) AND at least one of criteria 1–4 met (`HRS_Criteria == 1`)**. Each table has a **Download Excel** link directly underneath; the same tables are also written as CSVs to `Results/`.
+Every table from `Tables.Rmd` (`/Users/to909/Desktop/Tables`), recomputed on the cohort restricted to **bolus terlipressin initiation (`terli_route_day0 == 1`) AND none of criteria 2–4 met (`HRS_criteria_3 == 0`)** — no ACLF grade ≥ 3, no day-0 SCr ≥ 5, no SpO2/FiO2 < 357. *(Cohort corrected 11/25/2026; the initial run used `HRS_Criteria == 1`, N = 118.)* Each table has a **Download Excel** link directly underneath; the same tables are also written as CSVs to `Results/`.
 
 Conventions (identical to the originals): continuous variables are median [IQR] with Kruskal–Wallis tests (= Mann–Whitney for two groups); categorical variables are n (%) with chi-squared tests, or Fisher's exact test where the original used it (adverse-event tables); `Missing` is the percentage of the cohort missing that variable; the `Overall` column is display-only — p-values compare the strata.
 
@@ -33,14 +33,14 @@ source(knitr::purl(
 ```{r cohort}
 #| code-fold: true
 #| code-summary: "Show code — cohort definition"
-cohort <- master %>% filter(terli_route_day0 == 1, HRS_Criteria == 1)
+cohort <- master %>% filter(terli_route_day0 == 1, HRS_criteria_3 == 0)
 
 knitr::kable(
   tibble(
     Step = c(
       "Master dataset (shared pipeline, final_master_01282026)",
       "Bolus terlipressin initiation (terli_route_day0 == 1)",
-      "+ meets >=1 of criteria 1-4 (HRS_Criteria == 1) - final cohort"
+      "+ meets none of criteria 2-4 (HRS_criteria_3 == 0) - final cohort"
     ),
     N = c(
       nrow(master),
@@ -352,7 +352,7 @@ cohort <- cohort %>%
 #| code-summary: "Show code — Table 1 by HRS_reversal_new"
 make_table(all_vars, cohort, "HRS_reversal_new", "table1_by_HRS_reversal_new",
            cat_vars = categorical_vars, family = "Table 1",
-           caption = "Table 1 by HRS_reversal_new (bolus + HRS-criteria cohort)")
+           caption = "Table 1 by HRS_reversal_new (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/table1_by_HRS_reversal_new.xlsx)
@@ -362,7 +362,7 @@ make_table(all_vars, cohort, "HRS_reversal_new", "table1_by_HRS_reversal_new",
 #| code-summary: "Show code — Table 1 by hrs_responders"
 make_table(all_vars, cohort, "hrs_responders", "table1_by_hrs_responders",
            cat_vars = categorical_vars, family = "Table 1",
-           caption = "Table 1 by hrs_responders (bolus + HRS-criteria cohort)")
+           caption = "Table 1 by hrs_responders (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/table1_by_hrs_responders.xlsx)
@@ -372,7 +372,7 @@ make_table(all_vars, cohort, "hrs_responders", "table1_by_hrs_responders",
 #| code-summary: "Show code — Table 1 by hrs_responders_cat_2"
 make_table(all_vars, cohort, "hrs_responders_cat_2", "table1_by_hrs_responders_cat_2",
            cat_vars = categorical_vars, family = "Table 1",
-           caption = "Table 1 by hrs_responders_cat_2 (bolus + HRS-criteria cohort)")
+           caption = "Table 1 by hrs_responders_cat_2 (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/table1_by_hrs_responders_cat_2.xlsx)
@@ -382,7 +382,7 @@ make_table(all_vars, cohort, "hrs_responders_cat_2", "table1_by_hrs_responders_c
 #| code-summary: "Show code — Table 1 by time_to_death_status_90days"
 make_table(all_vars, cohort, "time_to_death_status_90days", "table1_by_time_to_death_status_90days",
            cat_vars = categorical_vars, family = "Table 1",
-           caption = "Table 1 by time_to_death_status_90days (bolus + HRS-criteria cohort)")
+           caption = "Table 1 by time_to_death_status_90days (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/table1_by_time_to_death_status_90days.xlsx)
@@ -392,7 +392,7 @@ make_table(all_vars, cohort, "time_to_death_status_90days", "table1_by_time_to_d
 #| code-summary: "Show code — Table 1 by HRS_criteria_3"
 make_table(all_vars, cohort, "HRS_criteria_3", "table1_by_HRS_criteria_3",
            cat_vars = categorical_vars, family = "Table 1",
-           caption = "Table 1 by HRS_criteria_3 (bolus + HRS-criteria cohort)")
+           caption = "Table 1 - overall column only (HRS_criteria_3 = 0 for the whole cohort by definition)")
 ```
 
 [Download Excel](tables/table1_by_HRS_criteria_3.xlsx)
@@ -402,7 +402,7 @@ make_table(all_vars, cohort, "HRS_criteria_3", "table1_by_HRS_criteria_3",
 #| code-summary: "Show code — Table 1 by HRS_criteria_meld"
 make_table(all_vars, cohort, "HRS_criteria_meld", "table1_by_HRS_criteria_meld",
            cat_vars = categorical_vars, family = "Table 1",
-           caption = "Table 1 by HRS_criteria_meld (bolus + HRS-criteria cohort)")
+           caption = "Table 1 by HRS_criteria_meld (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/table1_by_HRS_criteria_meld.xlsx)
@@ -414,7 +414,7 @@ make_table(all_vars, cohort, "HRS_criteria_meld", "table1_by_HRS_criteria_meld",
 #| code-summary: "Show code — Follow-up by HRS_reversal_new"
 make_table(followup_variables, cohort, "HRS_reversal_new", "followup_by_HRS_reversal_new",
            cat_vars = cat_followup_variables, family = "Follow-up",
-           caption = "Follow-up by HRS_reversal_new (bolus + HRS-criteria cohort)")
+           caption = "Follow-up by HRS_reversal_new (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/followup_by_HRS_reversal_new.xlsx)
@@ -424,7 +424,7 @@ make_table(followup_variables, cohort, "HRS_reversal_new", "followup_by_HRS_reve
 #| code-summary: "Show code — Follow-up by hrs_responders"
 make_table(followup_variables, cohort, "hrs_responders", "followup_by_hrs_responders",
            cat_vars = cat_followup_variables, family = "Follow-up",
-           caption = "Follow-up by hrs_responders (bolus + HRS-criteria cohort)")
+           caption = "Follow-up by hrs_responders (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/followup_by_hrs_responders.xlsx)
@@ -434,7 +434,7 @@ make_table(followup_variables, cohort, "hrs_responders", "followup_by_hrs_respon
 #| code-summary: "Show code — Follow-up by hrs_responders_cat_2"
 make_table(followup_variables, cohort, "hrs_responders_cat_2", "followup_by_hrs_responders_cat_2",
            cat_vars = cat_followup_variables, family = "Follow-up",
-           caption = "Follow-up by hrs_responders_cat_2 (bolus + HRS-criteria cohort)")
+           caption = "Follow-up by hrs_responders_cat_2 (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/followup_by_hrs_responders_cat_2.xlsx)
@@ -444,7 +444,7 @@ make_table(followup_variables, cohort, "hrs_responders_cat_2", "followup_by_hrs_
 #| code-summary: "Show code — Follow-up by time_to_death_status_90days"
 make_table(followup_variables, cohort, "time_to_death_status_90days", "followup_by_time_to_death_status_90days",
            cat_vars = cat_followup_variables, family = "Follow-up",
-           caption = "Follow-up by time_to_death_status_90days (bolus + HRS-criteria cohort)")
+           caption = "Follow-up by time_to_death_status_90days (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/followup_by_time_to_death_status_90days.xlsx)
@@ -454,7 +454,7 @@ make_table(followup_variables, cohort, "time_to_death_status_90days", "followup_
 #| code-summary: "Show code — Follow-up by HRS_criteria_3"
 make_table(followup_variables, cohort, "HRS_criteria_3", "followup_by_HRS_criteria_3",
            cat_vars = cat_followup_variables, family = "Follow-up",
-           caption = "Follow-up by HRS_criteria_3 (bolus + HRS-criteria cohort)")
+           caption = "Follow-up - overall column only (HRS_criteria_3 = 0 for the whole cohort by definition)")
 ```
 
 [Download Excel](tables/followup_by_HRS_criteria_3.xlsx)
@@ -464,7 +464,7 @@ make_table(followup_variables, cohort, "HRS_criteria_3", "followup_by_HRS_criter
 #| code-summary: "Show code — Follow-up by HRS_criteria_meld"
 make_table(followup_variables, cohort, "HRS_criteria_meld", "followup_by_HRS_criteria_meld",
            cat_vars = cat_followup_variables, family = "Follow-up",
-           caption = "Follow-up by HRS_criteria_meld (bolus + HRS-criteria cohort)")
+           caption = "Follow-up by HRS_criteria_meld (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/followup_by_HRS_criteria_meld.xlsx)
@@ -476,7 +476,7 @@ make_table(followup_variables, cohort, "HRS_criteria_meld", "followup_by_HRS_cri
 #| code-summary: "Show code — Hospital course by HRS_reversal_new"
 make_table(hospitalization_course_variables, cohort, "HRS_reversal_new", "hospitalization_by_HRS_reversal_new",
            cat_vars = cat_hospitalization_course_variables, family = "Hospital course",
-           caption = "Hospital course by HRS_reversal_new (bolus + HRS-criteria cohort)")
+           caption = "Hospital course by HRS_reversal_new (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/hospitalization_by_HRS_reversal_new.xlsx)
@@ -486,7 +486,7 @@ make_table(hospitalization_course_variables, cohort, "HRS_reversal_new", "hospit
 #| code-summary: "Show code — Hospital course by hrs_responders"
 make_table(hospitalization_course_variables, cohort, "hrs_responders", "hospitalization_by_hrs_responders",
            cat_vars = cat_hospitalization_course_variables, family = "Hospital course",
-           caption = "Hospital course by hrs_responders (bolus + HRS-criteria cohort)")
+           caption = "Hospital course by hrs_responders (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/hospitalization_by_hrs_responders.xlsx)
@@ -496,7 +496,7 @@ make_table(hospitalization_course_variables, cohort, "hrs_responders", "hospital
 #| code-summary: "Show code — Hospital course by hrs_responders_cat_2"
 make_table(hospitalization_course_variables, cohort, "hrs_responders_cat_2", "hospitalization_by_hrs_responders_cat_2",
            cat_vars = cat_hospitalization_course_variables, family = "Hospital course",
-           caption = "Hospital course by hrs_responders_cat_2 (bolus + HRS-criteria cohort)")
+           caption = "Hospital course by hrs_responders_cat_2 (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/hospitalization_by_hrs_responders_cat_2.xlsx)
@@ -506,7 +506,7 @@ make_table(hospitalization_course_variables, cohort, "hrs_responders_cat_2", "ho
 #| code-summary: "Show code — Hospital course by time_to_death_status_90days"
 make_table(hospitalization_course_variables, cohort, "time_to_death_status_90days", "hospitalization_by_time_to_death_status_90days",
            cat_vars = cat_hospitalization_course_variables, family = "Hospital course",
-           caption = "Hospital course by time_to_death_status_90days (bolus + HRS-criteria cohort)")
+           caption = "Hospital course by time_to_death_status_90days (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/hospitalization_by_time_to_death_status_90days.xlsx)
@@ -516,7 +516,7 @@ make_table(hospitalization_course_variables, cohort, "time_to_death_status_90day
 #| code-summary: "Show code — Hospital course by HRS_criteria_3"
 make_table(hospitalization_course_variables, cohort, "HRS_criteria_3", "hospitalization_by_HRS_criteria_3",
            cat_vars = cat_hospitalization_course_variables, family = "Hospital course",
-           caption = "Hospital course by HRS_criteria_3 (bolus + HRS-criteria cohort)")
+           caption = "Hospital course - overall column only (HRS_criteria_3 = 0 for the whole cohort by definition)")
 ```
 
 [Download Excel](tables/hospitalization_by_HRS_criteria_3.xlsx)
@@ -526,7 +526,7 @@ make_table(hospitalization_course_variables, cohort, "HRS_criteria_3", "hospital
 #| code-summary: "Show code — Hospital course by HRS_criteria_meld"
 make_table(hospitalization_course_variables, cohort, "HRS_criteria_meld", "hospitalization_by_HRS_criteria_meld",
            cat_vars = cat_hospitalization_course_variables, family = "Hospital course",
-           caption = "Hospital course by HRS_criteria_meld (bolus + HRS-criteria cohort)")
+           caption = "Hospital course by HRS_criteria_meld (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/hospitalization_by_HRS_criteria_meld.xlsx)
@@ -538,7 +538,7 @@ make_table(hospitalization_course_variables, cohort, "HRS_criteria_meld", "hospi
 #| code-summary: "Show code — HRS clinical course by HRS_reversal_new"
 make_table(hrs_clinical_course_variables, cohort, "HRS_reversal_new", "hrs_clinical_by_HRS_reversal_new",
            cat_vars = cat_hrs_clinical_course_variables, family = "HRS clinical course",
-           caption = "HRS clinical course by HRS_reversal_new (bolus + HRS-criteria cohort)")
+           caption = "HRS clinical course by HRS_reversal_new (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/hrs_clinical_by_HRS_reversal_new.xlsx)
@@ -548,7 +548,7 @@ make_table(hrs_clinical_course_variables, cohort, "HRS_reversal_new", "hrs_clini
 #| code-summary: "Show code — HRS clinical course by hrs_responders"
 make_table(hrs_clinical_course_variables, cohort, "hrs_responders", "hrs_clinical_by_hrs_responders",
            cat_vars = cat_hrs_clinical_course_variables, family = "HRS clinical course",
-           caption = "HRS clinical course by hrs_responders (bolus + HRS-criteria cohort)")
+           caption = "HRS clinical course by hrs_responders (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/hrs_clinical_by_hrs_responders.xlsx)
@@ -558,7 +558,7 @@ make_table(hrs_clinical_course_variables, cohort, "hrs_responders", "hrs_clinica
 #| code-summary: "Show code — HRS clinical course by hrs_responders_cat_2"
 make_table(hrs_clinical_course_variables, cohort, "hrs_responders_cat_2", "hrs_clinical_by_hrs_responders_cat_2",
            cat_vars = cat_hrs_clinical_course_variables, family = "HRS clinical course",
-           caption = "HRS clinical course by hrs_responders_cat_2 (bolus + HRS-criteria cohort)")
+           caption = "HRS clinical course by hrs_responders_cat_2 (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/hrs_clinical_by_hrs_responders_cat_2.xlsx)
@@ -568,7 +568,7 @@ make_table(hrs_clinical_course_variables, cohort, "hrs_responders_cat_2", "hrs_c
 #| code-summary: "Show code — HRS clinical course by time_to_death_status_90days"
 make_table(hrs_clinical_course_variables, cohort, "time_to_death_status_90days", "hrs_clinical_by_time_to_death_status_90days",
            cat_vars = cat_hrs_clinical_course_variables, family = "HRS clinical course",
-           caption = "HRS clinical course by time_to_death_status_90days (bolus + HRS-criteria cohort)")
+           caption = "HRS clinical course by time_to_death_status_90days (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/hrs_clinical_by_time_to_death_status_90days.xlsx)
@@ -578,7 +578,7 @@ make_table(hrs_clinical_course_variables, cohort, "time_to_death_status_90days",
 #| code-summary: "Show code — HRS clinical course by HRS_criteria_3"
 make_table(hrs_clinical_course_variables, cohort, "HRS_criteria_3", "hrs_clinical_by_HRS_criteria_3",
            cat_vars = cat_hrs_clinical_course_variables, family = "HRS clinical course",
-           caption = "HRS clinical course by HRS_criteria_3 (bolus + HRS-criteria cohort)")
+           caption = "HRS clinical course - overall column only (HRS_criteria_3 = 0 for the whole cohort by definition)")
 ```
 
 [Download Excel](tables/hrs_clinical_by_HRS_criteria_3.xlsx)
@@ -588,35 +588,35 @@ make_table(hrs_clinical_course_variables, cohort, "HRS_criteria_3", "hrs_clinica
 #| code-summary: "Show code — HRS clinical course by HRS_criteria_meld"
 make_table(hrs_clinical_course_variables, cohort, "HRS_criteria_meld", "hrs_clinical_by_HRS_criteria_meld",
            cat_vars = cat_hrs_clinical_course_variables, family = "HRS clinical course",
-           caption = "HRS clinical course by HRS_criteria_meld (bolus + HRS-criteria cohort)")
+           caption = "HRS clinical course by HRS_criteria_meld (bolus + HRS_criteria_3 = 0 cohort)")
 ```
 
 [Download Excel](tables/hrs_clinical_by_HRS_criteria_meld.xlsx)
 
 # Adverse events
 
-In this cohort `HRS_Criteria` and `terli_route_day0` are constant by definition, so the original "AE by HRS_Criteria" and "AE by terli_route_day0" tables collapse to the same single-column table: AEs in the whole cohort.
+In this cohort `terli_route_day0`, `HRS_criteria_3` and `criteria_2` are constant by definition, so the original "AE by terli_route_day0", "AE by HRS_criteria_3" and "AE by criteria_2" tables collapse to the same single-column table: AEs in the whole cohort. "AE by HRS_Criteria" is kept below — with criteria 2–4 all zero here, it is equivalent to stratifying by `criteria_1` (early discontinuation).
 
 ```{r ae-overall}
 #| code-fold: true
 #| code-summary: "Show code — AE overall"
 make_table(ae_vars, cohort, strata = NULL, "ae_overall",
            cat_vars = ae_vars, family = "AE",
-           caption = "Adverse events - whole cohort (replaces 'AE by HRS_Criteria' and 'AE by terli_route_day0', which are constant here)")
+           caption = "Adverse events - whole cohort (replaces 'AE by terli_route_day0', 'AE by HRS_criteria_3' and 'AE by criteria_2', which are constant here)")
 ```
 
 [Download Excel](tables/ae_overall.xlsx)
 
-```{r ae-criteria3}
+```{r ae-hrs-criteria}
 #| code-fold: true
-#| code-summary: "Show code — AE by HRS_criteria_3"
-make_table(ae_vars, cohort, "HRS_criteria_3", "ae_by_HRS_criteria_3",
+#| code-summary: "Show code — AE by HRS_Criteria"
+make_table(ae_vars, cohort, "HRS_Criteria", "ae_by_HRS_Criteria",
            cat_vars = ae_vars, family = "AE",
            exact = setdiff(ae_vars, c("terli_ae_respfail", "any_ae")),
-           caption = "Adverse events by HRS_criteria_3 (Fisher's exact except any_ae / terli_ae_respfail, as in Tables.Rmd)")
+           caption = "Adverse events by HRS_Criteria - equivalent to criteria_1 (early discontinuation) in this cohort (Fisher's exact except any_ae / terli_ae_respfail, as in Tables.Rmd)")
 ```
 
-[Download Excel](tables/ae_by_HRS_criteria_3.xlsx)
+[Download Excel](tables/ae_by_HRS_Criteria.xlsx)
 
 ```{r ae-criteria-meld}
 #| code-fold: true
@@ -628,16 +628,6 @@ make_table(ae_vars, cohort, "HRS_criteria_meld", "ae_by_HRS_criteria_meld",
 ```
 
 [Download Excel](tables/ae_by_HRS_criteria_meld.xlsx)
-
-```{r ae-criteria2}
-#| code-fold: true
-#| code-summary: "Show code — AE by criteria_2 (ACLF grade >= 3)"
-make_table(ae_vars, cohort, "criteria_2", "ae_by_criteria_2",
-           cat_vars = ae_vars, family = "AE", exact = ae_vars,
-           caption = "Adverse events by criteria_2 (ACLF grade >= 3); Fisher's exact for all AE variables, as in Tables.Rmd")
-```
-
-[Download Excel](tables/ae_by_criteria_2.xlsx)
 
 ```{r ae-meld35}
 #| code-fold: true
@@ -655,7 +645,7 @@ The two adverse-event tables from the 11/24/2026 follow-up request, in their own
 
 ## AE by HRS response — `hrs_responders_cat_2` (primary outcome)
 
-Within the bolus + HRS-criteria cohort (N = 118): **0 = no response** (n = 61) vs **1 = partial or full response** (n = 57).
+Within the bolus + HRS_criteria_3 = 0 cohort (N = 101): **0 = no response** (n = 39) vs **1 = partial or full response** (n = 62).
 
 ```{r ae-hrs-responders-cat2}
 #| code-fold: true
@@ -667,18 +657,18 @@ make_table(ae_vars, cohort, "hrs_responders_cat_2", "ae_by_hrs_responders_cat_2"
 
 [Download Excel](tables/ae_by_hrs_responders_cat_2.xlsx)
 
-## AE by subanalysis-cohort membership — in cohort (n = 118) vs rest of registry (n = 125)
+## AE by subanalysis-cohort membership — in cohort (n = 101) vs rest of registry (n = 142)
 
-The same AE variables compared between the patients **in** this subanalysis cohort (`terli_route_day0 == 1` & `HRS_Criteria == 1`, n = 118) and the **rest of the registry** (n = 125: bolus without criteria n = 89, continuous with criteria n = 13, continuous without criteria n = 23). This is the one table on this page computed on all 243 patients. Neither `terli_route_day0` nor `HRS_Criteria` has missing values, so the two groups partition the registry exactly.
+The same AE variables compared between the patients **in** this subanalysis cohort (`terli_route_day0 == 1` & `HRS_criteria_3 == 0`, n = 101) and the **rest of the registry** (n = 142: bolus with ≥1 of criteria 2–4 n = 106, continuous n = 36). This is the one table on this page computed on all 243 patients. Neither `terli_route_day0` nor `HRS_criteria_3` has missing values, so the two groups partition the registry exactly.
 
 ```{r ae-cohort-membership}
 #| code-fold: true
 #| code-summary: "Show code — AE by cohort membership (full registry)"
 master_ae <- master %>%
   mutate(in_cohort = factor(
-    if_else(terli_route_day0 == 1 & HRS_Criteria == 1,
-            "Bolus + >=1 criteria (n=118)", "Rest of registry (n=125)"),
-    levels = c("Bolus + >=1 criteria (n=118)", "Rest of registry (n=125)")
+    if_else(terli_route_day0 == 1 & HRS_criteria_3 == 0,
+            "Bolus + HRS_criteria_3=0 (n=101)", "Rest of registry (n=142)"),
+    levels = c("Bolus + HRS_criteria_3=0 (n=101)", "Rest of registry (n=142)")
   ))
 
 make_table(ae_vars, master_ae, "in_cohort", "ae_by_cohort_membership",
@@ -719,7 +709,7 @@ make_table(
   c("map_day_0", "map_day_2", "map_day_3", "map_diff_day3_0", "map_diff_day2_0"),
   map_wide, "hrs_responders_cat_2", "map_diff_by_hrs_responders_cat_2",
   family = "MAP",
-  caption = "Mean MAP by day and change from day 0, by hrs_responders_cat_2 (bolus + HRS-criteria cohort)"
+  caption = "Mean MAP by day and change from day 0, by hrs_responders_cat_2 (bolus + HRS_criteria_3 = 0 cohort)"
 )
 ```
 
